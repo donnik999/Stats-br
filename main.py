@@ -3,7 +3,7 @@ import random
 import logging
 import getpass
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
@@ -35,7 +35,8 @@ main_menu_kb = ReplyKeyboardMarkup(
 server_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text="RED", callback_data="server_red")],
-        [InlineKeyboardButton(text="GREEN", callback_data="server_green")]
+        [InlineKeyboardButton(text="GREEN", callback_data="server_green")],
+        [InlineKeyboardButton(text="BLUE", callback_data="server_blue")]
     ]
 )
 
@@ -53,6 +54,13 @@ class GreenBioStates(StatesGroup):
     waiting_name = State()
     waiting_gender = State()
     waiting_age = State()
+    waiting_nationality = State()
+
+class BlueBioStates(StatesGroup):
+    waiting_name = State()
+    waiting_gender = State()
+    waiting_age = State()
+    waiting_dob = State()
     waiting_nationality = State()
 
 # --- НАБОРЫ ДАННЫХ BLACK RUSSIA ---
@@ -88,10 +96,10 @@ FEMALE_NAMES = [
 ]
 
 EYE_COLORS = [
-    "карие", "голубые", "серые", "зеленые", "черные", "янтарные"
+    "карие", "голубые", "серые", "зеленые", "черные", "янтарные", "синие"
 ]
 HAIR_COLORS = [
-    "темные", "светлые", "русые", "каштановые", "черные", "седые"
+    "темные", "светлые", "русые", "каштановые", "черные", "седые", "темно-русые"
 ]
 BAD_HABITS = [
     "нет", "курение", "алкоголь", "азартные игры", "сквернословие", "опоздания"
@@ -192,6 +200,11 @@ def generate_birthdate(age: int) -> str:
     ]
     return f"{day:02d} {months_ru[month - 1]} {year} г."
 
+def random_date_of_birth(age: int):
+    today = datetime.today()
+    birthday = today - timedelta(days=365*age + random.randint(-200, 200))
+    return birthday.strftime("%d.%m.%Y")
+
 def random_height():
     return f"{random.randint(165, 200)} см"
 def random_weight():
@@ -244,8 +257,7 @@ def generate_bio_red(data: dict) -> str:
     )
     return result
 
-# ========== GREEN RP BIO (НОВЫЙ ФОРУМНЫЙ СТИЛЬ) ==========
-# Примеры для каждого этапа жизни
+# ========== GREEN RP BIO (ФОРУМНЫЙ СТИЛЬ) ==========
 GREEN_CHILDHOOD = [
     "С самого рождения был окружён любовью родителей, которые делали всё, чтобы я вырос достойным человеком. Наш дом отличался уютом и теплом. Отец с детства учил меня ценить труд, а мама — быть добрым и справедливым. Я часто бывал с отцом на его работе и помогал маме в её кондитерской лавке. Уже в детстве понял: чтобы чего-то добиться, нужно много работать.",
     "Родился и вырос в городе {city}, окружённом живописной природой. Был энергичным мальчиком: с друзьями гулял на улице, исследовал лесные тропинки. В детском саду завёл много друзей, а в школе учёба давалась легко благодаря поддержке семьи, особенно бабушки, которая приучила меня к ответственности.",
@@ -295,7 +307,6 @@ def generate_bio_green(data: dict) -> str:
     appearance = random_appearance()
     photo = "<i>прикрепить фото...</i>"
 
-    # Блоки жизненного пути с примерами
     childhood = random.choice(GREEN_CHILDHOOD).format(city=birthplace)
     youth = random.choice(GREEN_YOUTH)
     maturing = random.choice(GREEN_MATURING)
@@ -331,6 +342,55 @@ def generate_bio_green(data: dict) -> str:
     return result
 
 GREEN_PHOTO_NOTICE = "Пожалуйста, не забудьте прикрепить фото к биографии для подачи на сервер GREEN!"
+
+# ========== BLUE RP BIO ==========
+BLUE_CHILDHOOD = [
+    "Я появился на свет в дружной семье. Родители с первых дней жизни окружили меня заботой и вниманием. В детстве был активным и любознательным ребёнком: играл во дворе, изучал окружающий мир, родители поддерживали мои увлечения. В 7 лет пошёл в школу, учился хорошо, проявлял интерес к точным наукам. В школьные годы у меня появились верные друзья, с которыми мы вместе готовились к урокам и делились впечатлениями.",
+    "В детстве рос с трудолюбивыми родителями, которые всегда учили меня помогать другим. Папа часто брал меня за работу с машиной или в гараж, а мама поддерживала во всех начинаниях. В садик пошёл рано, в школе учился на 4 и 5, тройки были редко. В младших классах занялся спортом — особенно меня увлек бокс, участвовал в соревнованиях и уже в детстве достигал успехов.",
+    "С ранних лет был очень энергичным ребёнком: с друзьями постоянно устраивали игры во дворе, участвовал в школьных и городских мероприятиях. Родители поддерживали мои интересы, особенно любовь к спорту. Благодаря им я научился ставить цели и идти к ним."
+]
+
+BLUE_ADULT = [
+    "После окончания школы я поступил в колледж по технической специальности. В студенческие годы проявил интерес к спорту и тренерской деятельности, посещал онлайн-курсы по психологии. Постепенно начал тренировать других, помогал не только с физической формой, но и с мотивацией. Это стало моим призванием: я завёл множество клиентов и друзей, а занятия спортом помогли мне стать увереннее.",
+    "Несмотря на травму, не оставил спорт: решил открыть собственный клуб, попросил у родителей денег на аренду и инвентарь. Вскоре клуб заработал на полную, я стал тренировать детей и взрослых, у меня появилось много учеников. Позже ушёл в армию, прошёл службу, после вернулся и начал строить отношения с девушкой. История продолжается.",
+    "Я быстро проявил себя как хороший тренер: умел находить подход к разным людям, был дисциплинирован и целеустремлён. Профессионально занимался спортом, участвовал в турнирах, а позже стал обучать новичков и помогать им добиваться успеха."
+]
+
+BLUE_HOBBY = [
+    "Тренировки, отдых на природе, утренние пробежки, занятия с детьми, путешествия, компьютерные игры с друзьями.",
+    "Люблю спорт, прогулки на свежем воздухе, общение с близкими, иногда играю в видеоигры или читаю книги на тему психологии.",
+    "Мои увлечения — бодибилдинг, тренерство, поездки за город, мастер-классы для молодых спортсменов."
+]
+
+def generate_bio_blue(data: dict) -> str:
+    fio = data.get("fio", "Не указано")
+    gender = data.get("gender", "Не указано")
+    age = int(data.get("age", 18))
+    dob = data.get("dob", random_date_of_birth(age))
+    nationality = data.get("nationality", "Не указано")
+    family = data.get("family", "Мама — Ирина Иванова, папа — Иван Иванов")
+    appearance = data.get("appearance", "Высокий, спортивный, открытое лицо, карие глаза, аккуратная причёска.")
+    character = data.get("character", "Уверенный, открытый, целеустремлённый, доброжелательный, ответственный.")
+    residence = data.get("residence", "г. Арзамас")
+    education = data.get("education", "Среднее профессиональное образование.")
+    childhood = random.choice(BLUE_CHILDHOOD)
+    adult = random.choice(BLUE_ADULT)
+    hobby = random.choice(BLUE_HOBBY)
+    return (
+        f"<b>Имя и Фамилия:</b> {fio}\n"
+        f"<b>Пол:</b> {gender}\n"
+        f"<b>Дата рождения (день.месяц.год):</b> {dob}\n"
+        f"<b>Возраст:</b> {age}\n"
+        f"<b>Национальность:</b> {nationality}\n"
+        f"<b>Семья:</b> {family}\n"
+        f"<b>Описание внешности:</b> {appearance}\n"
+        f"<b>Описание характера:</b> {character}\n"
+        f"<b>Место текущего проживания:</b> {residence}\n"
+        f"<b>Образование:</b> {education}\n"
+        f"<b>Жизнь в детстве и юности:</b> {childhood}\n"
+        f"<b>Взрослая жизнь (включая настоящее время):</b> {adult}\n"
+        f"<b>Хобби:</b> {hobby}"
+    )
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
@@ -372,6 +432,10 @@ async def choose_server(callback: types.CallbackQuery, state: FSMContext):
     elif callback.data == "server_green":
         await state.clear()
         await state.set_state(GreenBioStates.waiting_name)
+        await callback.message.answer("<b>1️⃣ Введите имя и фамилию персонажа:</b>\nПример: Иван Иванов", parse_mode="HTML")
+    elif callback.data == "server_blue":
+        await state.clear()
+        await state.set_state(BlueBioStates.waiting_name)
         await callback.message.answer("<b>1️⃣ Введите имя и фамилию персонажа:</b>\nПример: Иван Иванов", parse_mode="HTML")
     await callback.answer()
 
@@ -490,6 +554,80 @@ async def greenbio_nationality(message: types.Message, state: FSMContext):
     bio = generate_bio_green(data)
     await message.answer("<b>Ваша уникальная RP-биография для сервера GREEN:</b>\n\n" + bio, parse_mode="HTML", reply_markup=main_menu_kb)
     await message.answer(f"⚠️ <b>{GREEN_PHOTO_NOTICE}</b>", parse_mode="HTML")
+    await state.set_state(MenuStates.waiting_main_menu)
+
+# --- BLUE ---
+@dp.message(BlueBioStates.waiting_name)
+async def bluebio_name(message: types.Message, state: FSMContext):
+    fio = message.text.strip()
+    await state.update_data(fio=fio)
+    await state.set_state(BlueBioStates.waiting_gender)
+    kb = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Мужской")],
+            [KeyboardButton(text="Женский")],
+            [KeyboardButton(text="🏠 Главное меню")]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+    await message.answer("<b>2️⃣ Укажите пол персонажа:</b>", reply_markup=kb, parse_mode="HTML")
+
+@dp.message(BlueBioStates.waiting_gender)
+async def bluebio_gender(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    gender = message.text.strip()
+    if gender.lower() not in ["мужской", "женский"]:
+        await message.answer("Пожалуйста, выберите пол кнопкой ниже.")
+        return
+    await state.update_data(gender=gender.capitalize())
+    await state.set_state(BlueBioStates.waiting_age)
+    await message.answer("<b>3️⃣ Укажите возраст персонажа (от 16 до 65):</b>", reply_markup=types.ReplyKeyboardRemove(), parse_mode="HTML")
+
+@dp.message(BlueBioStates.waiting_age)
+async def bluebio_age(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    try:
+        age = int(message.text.strip())
+        if age < 16 or age > 65:
+            raise ValueError
+    except ValueError:
+        await message.answer("⚠️ Укажите возраст числом от 16 до 65.")
+        return
+    await state.update_data(age=age)
+    await state.set_state(BlueBioStates.waiting_dob)
+    await message.answer("<b>4️⃣ Укажите дату рождения персонажа (дд.мм.гггг):</b>\nПример: 01.01.2000", parse_mode="HTML")
+
+@dp.message(BlueBioStates.waiting_dob)
+async def bluebio_dob(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    dob = message.text.strip()
+    # Допустимая дата: 01.01.1900 - 31.12.2025, просто базовая проверка
+    try:
+        datetime.strptime(dob, "%d.%m.%Y")
+    except Exception:
+        await message.answer("⚠️ Введите дату рождения в формате дд.мм.гггг. Например: 01.01.2000")
+        return
+    await state.update_data(dob=dob)
+    await state.set_state(BlueBioStates.waiting_nationality)
+    await message.answer("<b>5️⃣ Укажите национальность персонажа:</b>", parse_mode="HTML")
+
+@dp.message(BlueBioStates.waiting_nationality)
+async def bluebio_nationality(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    nationality = message.text.strip().capitalize()
+    await state.update_data(nationality=nationality)
+    data = await state.get_data()
+    bio = generate_bio_blue(data)
+    await message.answer("<b>Ваша уникальная RP-биография для сервера BLUE:</b>\n\n" + bio, parse_mode="HTML", reply_markup=main_menu_kb)
     await state.set_state(MenuStates.waiting_main_menu)
 
 async def main():
