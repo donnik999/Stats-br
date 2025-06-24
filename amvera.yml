@@ -1,4 +1,4 @@
-  entrypoint: python main.py
+entrypoint: python main.py
 requirements: requirements.txt
 env:
   TELEGRAM_TOKEN: "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
