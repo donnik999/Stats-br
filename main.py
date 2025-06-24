@@ -6,7 +6,6 @@ from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 import aiohttp
 from bs4 import BeautifulSoup
-
 import os
 
 API_TOKEN = os.environ.get("API_TOKEN", "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")
@@ -39,7 +38,7 @@ async def search_player(message: Message):
     if info:
         await message.answer(info, disable_web_page_preview=True)
     else:
-        await message.answer(f"😔 Не удалось найти информацию о <b>{nickname}</b> на форуме.")
+        await message.answer(f"😔 Не удалось найти информацию о <b>{nickname}</b> на форуме. Также сохранён файл ответа форума для анализа.")
 
 async def search_on_forum(nickname: str) -> str:
     url = FORUM_SEARCH_URL.format(query=nickname.replace(" ", "+"))
@@ -51,16 +50,16 @@ async def search_on_forum(nickname: str) -> str:
             if resp.status != 200:
                 return None
             text = await resp.text()
+            # Сохраняем ответ форума в файл для анализа разметки
+            with open("forum_response.html", "w", encoding="utf-8") as f:
+                f.write(text)
+            # Далее идёт обычный парсер
             soup = BeautifulSoup(text, "lxml")
-
-            # Поиск блоков с результатами
             items = soup.select(".structItem--post")
             if not items:
-                # fallback на старую версию форума/темы
                 items = soup.select(".structItem")
-
             results = []
-            for item in items[:3]:  # максимум 3 результата
+            for item in items[:3]:
                 title_a = item.select_one(".structItem-title a")
                 if not title_a:
                     continue
@@ -68,23 +67,16 @@ async def search_on_forum(nickname: str) -> str:
                 link = title_a["href"]
                 if link.startswith("/"):
                     link = "https://forum.blackrussia.online" + link
-
-                # Отрывок сообщения
                 snippet = item.select_one(".structItem-snippet")
                 snippet_text = snippet.get_text(strip=True) if snippet else ""
-
-                # Краткая информация об авторе/времени, если есть
                 user_info = item.select_one(".structItem-minor")
                 user_text = user_info.get_text(strip=True) if user_info else ""
-
-                # Собираем результат
                 result = f"🔗 <a href='{link}'>{title}</a>"
                 if snippet_text:
                     result += f"\n📝 <i>{snippet_text}</i>"
                 if user_text:
                     result += f"\n👤 {user_text}"
                 results.append(result)
-
             if results:
                 return "<b>Результаты поиска:</b>\n\n" + "\n\n".join(results)
             return None
