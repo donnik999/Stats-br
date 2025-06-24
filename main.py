@@ -1,25 +1,28 @@
 import asyncio
 import logging
-import os
+import openai
 from aiogram import Bot, Dispatcher, Router, types, F
 from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-import openai
 
-from config import TELEGRAM_TOKEN, DEEPSEEK_API_KEY
+# ====== ВСТАВЬ СВОИ ДАННЫЕ СЮДА ======
+TELEGRAM_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
+DEEPSEEK_API_KEY = "sk-fab5d466db514e5087656e9c49a7a03d"
+# =====================================
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
-# Создаем бота и диспетчер
+# Инициализация бота и диспетчера
 bot = Bot(token=TELEGRAM_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 router = Router()
 
+# Настройки DeepSeek API
 openai.api_base = "https://api.deepseek.com/v1"
 openai.api_key = DEEPSEEK_API_KEY
 
@@ -29,7 +32,7 @@ menu_kb = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
-# FSM состояния
+# FSM состояния для сбора данных
 class BioStates(StatesGroup):
     waiting_fio = State()
     waiting_age = State()
@@ -45,7 +48,7 @@ async def cmd_start(message: types.Message):
     )
     await message.answer(text, reply_markup=menu_kb)
 
-# Обработка кнопки
+# Кнопка меню
 @router.message(F.text == "✍️ Написать РП биографию")
 async def start_bio(message: types.Message, state: FSMContext):
     await state.set_state(BioStates.waiting_fio)
@@ -75,7 +78,7 @@ async def bio_nationality(message: types.Message, state: FSMContext):
     data = await state.get_data()
     await state.clear()
 
-    # Генерация промпта для DeepSeek
+    # Формируем промпт для DeepSeek
     prompt = (
         f"Напиши RP-биографию персонажа на форум по шаблону, используя такие данные:\n"
         f"ФИО: {data['fio']}\n"
