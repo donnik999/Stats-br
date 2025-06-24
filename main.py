@@ -12,7 +12,7 @@ import openai
 
 logging.basicConfig(level=logging.INFO)
 
-# Ввод токенов через переменные окружения или ручной ввод
+# Получаем токены из переменных окружения или через консольный ввод
 TELEGRAM_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
 DEEPSEEK_API_KEY = "sk-fab5d466db514e5087656e9c49a7a03d"
 
@@ -25,7 +25,7 @@ bot = Bot(token=TELEGRAM_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
-# Новый клиент для openai>=1.0.0
+# Новый клиент OpenAI БЕЗ proxies!
 client = openai.OpenAI(
     api_key=DEEPSEEK_API_KEY,
     base_url="https://api.deepseek.com/v1"
@@ -91,7 +91,6 @@ async def bio_nationality(message: types.Message, state: FSMContext):
     await message.answer("Генерирую биографию, подождите...")
 
     try:
-        # Новый вызов openai для версии >=1.0.0!
         response = client.chat.completions.create(
             model="deepseek-chat",
             messages=[
