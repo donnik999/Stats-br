@@ -8,104 +8,107 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-import openai
 
 logging.basicConfig(level=logging.INFO)
 
-# Получаем токены из переменных окружения или через консольный ввод
 TELEGRAM_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
-DEEPSEEK_API_KEY = "sk-fab5d466db514e5087656e9c49a7a03d"
-
 if not TELEGRAM_TOKEN:
     TELEGRAM_TOKEN = getpass.getpass("Введите TELEGRAM_TOKEN: ")
-if not DEEPSEEK_API_KEY:
-    DEEPSEEK_API_KEY = getpass.getpass("Введите DEEPSEEK_API_KEY (DeepSeek): ")
 
 bot = Bot(token=TELEGRAM_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
-# Новый клиент OpenAI БЕЗ proxies!
-client = openai.OpenAI(
-    api_key=DEEPSEEK_API_KEY,
-    base_url="https://api.deepseek.com/v1"
-)
-
+# Кнопка меню
 menu_kb = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton(text="✍️ Написать РП биографию")]],
+    keyboard=[[KeyboardButton(text="📝 Сгенерировать РП-биографию")]],
     resize_keyboard=True,
 )
 
 class BioStates(StatesGroup):
     waiting_fio = State()
     waiting_age = State()
-    waiting_gender = State()
     waiting_nationality = State()
 
+# Приветствие и описание бота
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     text = (
-        "👋 Привет! Я бот для генерации RP-биографий по шаблону.\n"
+        "👋 <b>Добро пожаловать в RP Biography Bot!</b>\n\n"
+        "Этот бот поможет тебе <b>создать уникальную RP-биографию</b> для мира <b>Black Russia</b> по всем правилам сервера.\n"
+        "Бот задаст тебе несколько вопросов и соберёт анкету — а дальше сгенерирует красивую, грамотную биографию твоего персонажа.\n\n"
         "Нажми кнопку ниже, чтобы начать:"
     )
-    await message.answer(text, reply_markup=menu_kb)
+    await message.answer(text, reply_markup=menu_kb, parse_mode="HTML")
 
-@dp.message(lambda m: m.text == "✍️ Написать РП биографию")
+# Кнопка запуска анкеты
+@dp.message(lambda m: m.text == "📝 Сгенерировать РП-биографию")
 async def start_bio(message: types.Message, state: FSMContext):
     await state.set_state(BioStates.waiting_fio)
-    await message.answer("Введите ФИО персонажа (например: Иванов Иван Иванович):")
+    await message.answer(
+        "<b>1️⃣ Укажите ФИО персонажа:</b>\n\n"
+        "Пример: <i>Иванов Иван Иванович</i>\n"
+        "Имя и фамилия должны быть на русском языке, без нижних подчёркиваний.",
+        parse_mode="HTML"
+    )
 
+# Ввод ФИО
 @dp.message(BioStates.waiting_fio)
 async def bio_fio(message: types.Message, state: FSMContext):
-    await state.update_data(fio=message.text)
+    fio = message.text.strip()
+    if "_" in fio or not all(x.isalpha() or x.isspace() for x in fio):
+        await message.answer(
+            "⚠️ <b>ФИО должно быть на русском языке, без нижних подчёркиваний и лишних символов.</b>\n"
+            "Попробуй ещё раз.\n"
+            "Пример: <i>Иванов Иван Иванович</i>",
+            parse_mode="HTML"
+        )
+        return
+    await state.update_data(fio=fio)
     await state.set_state(BioStates.waiting_age)
-    await message.answer("Введите возраст персонажа (например: 25):")
+    await message.answer(
+        "<b>2️⃣ Укажите возраст персонажа:</b>\n"
+        "Возраст должен быть от <b>18</b> до <b>65</b> лет.",
+        parse_mode="HTML"
+    )
 
+# Ввод возраста
 @dp.message(BioStates.waiting_age)
 async def bio_age(message: types.Message, state: FSMContext):
-    await state.update_data(age=message.text)
-    await state.set_state(BioStates.waiting_gender)
-    await message.answer("Укажите пол персонажа (Мужской/Женский):")
-
-@dp.message(BioStates.waiting_gender)
-async def bio_gender(message: types.Message, state: FSMContext):
-    await state.update_data(gender=message.text)
+    try:
+        age = int(message.text.strip())
+        if age < 18 or age > 65:
+            raise ValueError
+    except ValueError:
+        await message.answer(
+            "⚠️ <b>Возраст должен быть числом от 18 до 65.</b>\nПопробуй ещё раз.",
+            parse_mode="HTML"
+        )
+        return
+    await state.update_data(age=age)
     await state.set_state(BioStates.waiting_nationality)
-    await message.answer("Укажите национальность персонажа:")
+    await message.answer(
+        "<b>3️⃣ Укажите национальность персонажа:</b>\n"
+        "Пример: <i>Русский, Татарин, Армянин, Чеченец, Итальянец и т.п.</i>",
+        parse_mode="HTML"
+    )
 
+# Ввод национальности — после этого можешь добавить генерацию биографии!
 @dp.message(BioStates.waiting_nationality)
 async def bio_nationality(message: types.Message, state: FSMContext):
-    await state.update_data(nationality=message.text)
+    nationality = message.text.strip().capitalize()
+    await state.update_data(nationality=nationality)
     data = await state.get_data()
-    await state.clear()
-    prompt = (
-        f"Напиши RP-биографию персонажа на форум по шаблону, используя такие данные:\n"
-        f"ФИО: {data.get('fio')}\n"
-        f"Возраст: {data.get('age')}\n"
-        f"Пол: {data.get('gender')}\n"
-        f"Национальность: {data.get('nationality')}\n"
-        "Остальные пункты (детство, юность, настоящее, характер, семья, хобби, внешность и т.д.) придумай сам, соблюдая правило написания от первого лица, без сверхспособностей, без известных личностей, без ошибок. Минимум 10 строк на раздел детство, юность, настоящее.\n"
-        "Шаблон:\n"
-        "ФИО:\nПол:\nДата рождения:\nВозраст:\nНациональность:\nМесто рождения:\nОбразование:\nОтношение к воинской службе(для мужчин):\nСемья:\nМесто проживания на момент проживания с родителями:\nОписание внешности:\nОсобенности характера:\nВаше фото:\nДетство(От десяти строк):\nЮность(От десяти строк):\nНастоящее время(От десяти строк):\nСемейное положение:\nМесто текущего проживания:\nИмеется ли судимость?:\nВаше хобби:"
+    # Здесь вызов генератора биографии (функция будет ниже)
+    await message.answer(
+        f"✅ <b>Анкета заполнена!</b>\n\n"
+        f"ФИО: <i>{data['fio']}</i>\n"
+        f"Возраст: <i>{data['age']}</i>\n"
+        f"Национальность: <i>{data['nationality']}</i>\n\n"
+        f"Генерация биографии скоро будет доступна...",
+        parse_mode="HTML"
     )
-    await message.answer("Генерирую биографию, подождите...")
-
-    try:
-        response = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=[
-                {"role": "system", "content": "Ты пишешь грамотные RP-биографии на русском языке по форумному шаблону."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=1200,
-        )
-        bio_text = response.choices[0].message.content
-    except Exception as e:
-        await message.answer(f"Ошибка генерации биографии: {e}")
-        return
-
-    await message.answer("Вот ваша RP-биография:\n\n" + bio_text)
+    await state.clear()
 
 async def main():
     await dp.start_polling(bot)
