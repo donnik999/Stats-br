@@ -9,14 +9,14 @@ import asyncio
 
 API_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
 
-# ------------- Основные состояния FSM -------------
+# --- СТАНДАРТНЫЕ СОСТОЯНИЯ FSM ---
 
 class MenuStates(StatesGroup):
     waiting_main_menu = State()
     choosing_server = State()
 
-# Обычные серверы (примерные FSM, их можно копипастить)
-class RedBioStates(StatesGroup):
+# Состояния для обычных серверов
+class UniversalBioStates(StatesGroup):
     waiting_name = State()
     waiting_surname = State()
     waiting_nationality = State()
@@ -27,102 +27,19 @@ class RedBioStates(StatesGroup):
     waiting_adult = State()
     waiting_present = State()
 
-class GreenBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
-class BlueBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
-class YellowBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
-class OrangeBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
-class PinkBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
+# PURPLE (особая логика)
 class PurpleBioStates(StatesGroup):
     waiting_nickname = State()
     waiting_nationality = State()
     waiting_age = State()
     waiting_gender = State()
 
-class BrownBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
+# --- КНОПКИ ---
 
-class CyanBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
-class WhiteBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
-# ------------- Кнопки -------------
-
+exit_kb = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="🏠 Главное меню")]],
+    resize_keyboard=True
+)
 main_menu_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="🌟 Создать РП-Биографию")],
@@ -130,27 +47,24 @@ main_menu_kb = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
-
-# Список серверов в один столбик, по порядку создания
 server_names = [
     "RED", "GREEN", "BLUE", "YELLOW", "ORANGE",
-    "PINK", "PURPLE", "BROWN", "CYAN", "WHITE"
+    "PURPLE", "LIME", "PINK", "CHERRY", "BLACK"
 ]
 server_callbacks = [
     "server_red", "server_green", "server_blue", "server_yellow", "server_orange",
-    "server_pink", "server_purple", "server_brown", "server_cyan", "server_white"
+    "server_purple", "server_lime", "server_pink", "server_cherry", "server_black"
 ]
 server_kb = InlineKeyboardMarkup(
     inline_keyboard=[[InlineKeyboardButton(text=server_names[i], callback_data=server_callbacks[i])] for i in range(10)]
 )
-
 contact_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text="Написать разработчику", url="https://t.me/BUNKOC")]
     ]
 )
 
-# ------------- Генерация внешности и прочих данных -------------
+# --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ГЕНЕРАЦИИ ---
 
 def random_appearance():
     heights = [str(h) + " см" for h in range(160, 201, 5)]
@@ -170,15 +84,15 @@ def random_hobby():
     hobbies = [
         "Бокс", "Фотография", "Графический дизайн", "Видеомонтаж", "Музыка", 
         "Путешествия", "Чтение книг", "Спорт", "Программирование", 
-        "Автомобили", "Рисование", "Плавание", "Игра на гитаре"
+        "Автомобили", "Рисование", "Плавание", "Игра на гитаре", "Кулинария", "Лыжи", "Велоспорт"
     ]
-    return ", ".join(random.sample(hobbies, random.randint(1, 3)))
+    return ", ".join(random.sample(hobbies, random.randint(2, 4)))
 
 def random_education():
     return random.choice([
         "Высшее", "Среднее специальное", "Среднее", 
         "Высшее (экономика)", "Высшее (юриспруденция)", 
-        "Высшее (информатика)", "Высшее (инженерное дело)"
+        "Высшее (информатика)", "Высшее (инженерное дело)", "Высшее (журналистика)"
     ])
 
 def random_marital():
@@ -188,7 +102,8 @@ def random_marital():
 
 def random_city():
     return random.choice([
-        "Арзамас", "Южный", "Нижегородск", "Лыткарино", "Москва", "Санкт-Петербург", "Новосибирск"
+        "Арзамас", "Южный", "Нижегородск", "Лыткарино", "Москва", "Санкт-Петербург",
+        "Новосибирск", "Казань", "Краснодар", "Владивосток", "Екатеринбург"
     ])
 
 def random_date_of_birth(age: int):
@@ -204,9 +119,82 @@ def random_date_of_birth(age: int):
     day = random.randint(1, days)
     return f"{day:02d}.{month:02d}.{year}"
 
-# ------------- Генераторы анкет -------------
+def extended_bio_blocks(data):
+    name = data.get('name', 'Имя')
+    surname = data.get('surname', 'Фамилия')
+    city = random_city()
+    hobby = random_hobby()
+    # Детство
+    childhood = (
+        f"{name} {surname} родился в городе {city} в дружной семье. "
+        f"С ранних лет проявлял живой интерес к окружающему миру и много времени проводил на свежем воздухе. "
+        "В детстве он часто играл с друзьями во дворе, строил шалаши, катался на велосипеде и собирал коллекции марок и монет. "
+        "Родители поощряли его любознательность, покупали книги и развивающие игры. "
+        "В начальной школе {name} быстро освоил чтение и математику, а учителя отмечали его как одного из самых активных учеников класса."
+    )
+    # Юность
+    youth = (
+        f"В подростковом возрасте {name} стал заниматься {hobby.split(',')[0].lower()} и посещать различные секции и кружки. "
+        "Он принимал участие в школьных олимпиадах, городских конкурсах и спортивных соревнованиях, часто занимая призовые места. "
+        "У него сформировался круг близких друзей, с которыми они устраивали походы, совместные проекты и вечерние посиделки у костра. "
+        "В это время {name} начал интересоваться современными технологиями, записался на курсы программирования и даже собрал свой первый компьютер. "
+        "Учителя и одноклассники уважали его за честность, ответственность и умение работать в команде."
+    )
+    # Взрослая жизнь
+    adult = (
+        f"Окончив школу с отличием, {name} поступил в университет, выбрав направление по душе. "
+        "Во время учёбы он активно участвовал в студенческих конференциях, волонтёрских движениях и студсовете. "
+        "Параллельно {name} подрабатывал по специальности, что позволило ему получить ценный опыт и обзавестись нужными связями. "
+        "В университете он организовал несколько крупных мероприятий, а также подготовил научную работу, которая была отмечена на всероссийском уровне. "
+        "После получения диплома {name} устроился на работу, где быстро зарекомендовал себя как инициативный и надёжный сотрудник."
+    )
+    # Наше время
+    present = (
+        f"Сейчас {name} {surname} продолжает совершенствоваться в профессиональной и личной жизни. "
+        "Он занимается самообразованием, посещает мастер-классы и тренинги, следит за новостями в своей области. "
+        "В свободное время {name} любит путешествовать, изучать новые языки и культуры, заниматься спортом и творчеством. "
+        "Друзья и близкие ценят его за отзывчивость, доброту и умение поддержать в трудную минуту. "
+        "В планах у {name} открыть собственный проект и реализовать несколько амбициозных идей, которые помогут сделать мир немного лучше."
+    )
+    return childhood, youth, adult, present
 
-def default_generate_bio(data):
+def extended_purple_blocks(data):
+    nickname = data.get("nickname", "Nick Name")
+    city = random_city()
+    hobby = random_hobby()
+    # Детство
+    childhood = (
+        f"{nickname} родился в городе {city}, в творческой семье. "
+        "С самых ранних лет отличался любознательностью и самостоятельностью: он с удовольствием исследовал окрестности, "
+        "строил сложные конструкции из конструктора и любил слушать рассказы старших о жизни в прошлом. "
+        f"В детстве {nickname} научился кататься на велосипеде, плавать и даже освоил азы {hobby.split(',')[0].lower()}. "
+        "Школьные учителя отмечали его как активного, доброго и трудолюбивого ребёнка, который всегда помогал одноклассникам."
+    )
+    # Юность
+    youth = (
+        f"В подростковом возрасте {nickname} начал проявлять лидерские качества, стал капитаном спортивной команды и организатором школьных мероприятий. "
+        "Он всерьёз занялся {hobby.split(',')[0].lower()}, участвовал в олимпиадах и городских чемпионатах. "
+        "С друзьями {nickname} часто ездил в летние лагеря, участвовал в волонтёрских акциях и делал первые успехи в программировании. "
+        "Учителя и наставники ценили его за ответственность, стремление к развитию и умение вдохновлять других."
+    )
+    # Взрослая жизнь
+    adult = (
+        f"После школы {nickname} поступил в один из лучших вузов страны, где быстро влился в студенческую жизнь. "
+        "Он стал активным участником научных конференций, занимался исследовательскими проектами и нередко помогал младшим курсам осваивать учебный материал. "
+        "Параллельно {nickname} подрабатывал по специальности, участвовал в стартапах и расширял профессиональный круг знакомств. "
+        "Полученные знания и опыт позволили ему успешно защитить диплом и найти интересную работу в престижной компании."
+    )
+    # Наше время
+    present = (
+        f"Сегодня {nickname} продолжает активно развиваться, занимается спортом, путешествует по разным странам и осваивает новые навыки. "
+        "Он участвует в профессиональных сообществах, делится опытом с коллегами и помогает начинающим специалистам. "
+        "В свободное время {nickname} увлекается творчеством, любит читать современные книги и изучать иностранные языки. "
+        "Близкие ценят его за искренность, чувство юмора и готовность прийти на помощь в любой ситуации."
+    )
+    return childhood, youth, adult, present
+
+def universal_generate_bio(data, server):
+    childhood, youth, adult, present = extended_bio_blocks(data)
     return (
         f"Имя: {data['name']}\n"
         f"Фамилия: {data['surname']}\n"
@@ -215,10 +203,10 @@ def default_generate_bio(data):
         f"Пол: {data['gender']}\n"
         f"{random_appearance()}\n"
         f"Увлечение: {random_hobby()}\n\n"
-        f"Детство:\n{data['childhood']}\n\n"
-        f"Юность:\n{data['youth']}\n\n"
-        f"Взрослая жизнь:\n{data['adult']}\n\n"
-        f"Наше время:\n{data['present']}"
+        f"Детство:\n{childhood}\n\n"
+        f"Юность:\n{youth}\n\n"
+        f"Взрослая жизнь:\n{adult}\n\n"
+        f"Наше время:\n{present}"
     )
 
 def purple_generate_bio(data):
@@ -236,23 +224,7 @@ def purple_generate_bio(data):
     hair = random.choice(["Русые", "Каштановые", "Темные", "Светло-русые", "Черные", "Темно-русые", "Блонд"])
     bodytype = random.choice(["Спортивное", "Крепкое", "Среднее", "Худощавое", "Плотное"])
     hobby = random_hobby()
-    childhood = (
-        f"{nickname} родился в {city}. С ранних лет проявлял интерес к {hobby.split(',')[0].lower()}. "
-        f"В школе отличался {random.choice(['любознательностью', 'трудолюбием', 'доброжелательностью'])}, "
-        f"родители поддерживали его увлечения."
-    )
-    youth = (
-        f"В подростковом возрасте {nickname.split()[0]} начал активно заниматься {hobby.split(',')[0].lower()}. "
-        f"Он участвовал в школьных мероприятиях, проявлял инициативу и расширял кругозор."
-    )
-    adult_life = (
-        f"Закончив школу, поступил в учебное заведение по направлению '{education}'. "
-        f"Параллельно работал и совершенствовал навыки в {hobby.split(',')[0].lower()}."
-    )
-    present = (
-        f"Сегодня {nickname} активно развивается в выбранной сфере, поддерживает здоровый образ жизни, "
-        f"общается с единомышленниками и строит амбициозные планы на будущее."
-    )
+    childhood, youth, adult, present = extended_purple_blocks(data)
     return (
         f"Никнейм: {nickname}\n"
         f"Национальность: {nationality}\n"
@@ -269,11 +241,11 @@ def purple_generate_bio(data):
         f"Увлечение: {hobby}\n\n"
         f"Детство:\n{childhood}\n\n"
         f"Юность:\n{youth}\n\n"
-        f"Взрослая жизнь:\n{adult_life}\n\n"
+        f"Взрослая жизнь:\n{adult}\n\n"
         f"Наше время:\n{present}"
     )
 
-# ------------- Хендлеры -------------
+# --- FSM и HANDLERS ---
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
@@ -282,8 +254,8 @@ dp = Dispatcher()
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        "<b>👋 Добро пожаловать в генератор РП-Биографий для всех серверов!</b>\n\n"
-        "Создай уникальную анкету для любого сервера и начни своё ролевое приключение!\n\n"
+        "<b>👋 Добро пожаловать в генератор РП-Биографий!</b>\n\n"
+        "Создай уникальную анкету для любого сервера и начни своё ролевое приключение.\n\n"
         "ℹ️ <i>Если возникнут вопросы — жми кнопку связи ниже.</i>",
         reply_markup=main_menu_kb,
         parse_mode="HTML"
@@ -307,164 +279,175 @@ async def menu_handler(message: types.Message, state: FSMContext):
             parse_mode="HTML"
         )
     else:
-        await message.answer("Пожалуйста, воспользуйтесь меню ниже 👇")
+        await message.answer("Пожалуйста, воспользуйтесь меню ниже 👇", reply_markup=main_menu_kb)
 
 @dp.callback_query(MenuStates.choosing_server)
 async def choose_server(callback: types.CallbackQuery, state: FSMContext):
     cdata = callback.data
     await callback.answer()
-    # RED
-    if cdata == "server_red":
-        await state.clear()
-        await state.set_state(RedBioStates.waiting_name)
-        await callback.message.answer("📝 Введите имя персонажа:")
-    # GREEN
-    elif cdata == "server_green":
-        await state.clear()
-        await state.set_state(GreenBioStates.waiting_name)
-        await callback.message.answer("📝 Введите имя персонажа:")
-    # BLUE
-    elif cdata == "server_blue":
-        await state.clear()
-        await state.set_state(BlueBioStates.waiting_name)
-        await callback.message.answer("📝 Введите имя персонажа:")
-    # YELLOW
-    elif cdata == "server_yellow":
-        await state.clear()
-        await state.set_state(YellowBioStates.waiting_name)
-        await callback.message.answer("📝 Введите имя персонажа:")
-    # ORANGE
-    elif cdata == "server_orange":
-        await state.clear()
-        await state.set_state(OrangeBioStates.waiting_name)
-        await callback.message.answer("📝 Введите имя персонажа:")
-    # PINK
-    elif cdata == "server_pink":
-        await state.clear()
-        await state.set_state(PinkBioStates.waiting_name)
-        await callback.message.answer("📝 Введите имя персонажа:")
-    # PURPLE (уникальная логика)
-    elif cdata == "server_purple":
+    if cdata == "server_purple":
         await state.clear()
         await state.set_state(PurpleBioStates.waiting_nickname)
         await callback.message.answer(
-            "📝 Введите игровой никнейм (строго формат 'Имя Фамилия', например Sander Kligan):"
-        )
-    # BROWN
-    elif cdata == "server_brown":
-        await state.clear()
-        await state.set_state(BrownBioStates.waiting_name)
-        await callback.message.answer("📝 Введите имя персонажа:")
-    # CYAN
-    elif cdata == "server_cyan":
-        await state.clear()
-        await state.set_state(CyanBioStates.waiting_name)
-        await callback.message.answer("📝 Введите имя персонажа:")
-    # WHITE
-    elif cdata == "server_white":
-        await state.clear()
-        await state.set_state(WhiteBioStates.waiting_name)
-        await callback.message.answer("📝 Введите имя персонажа:")
-
-# ---------------------- UNIVERSAL FSM HANDLER (кроме PURPLE) ----------------------
-
-async def universal_fsm(message: types.Message, state: FSMContext, bio_states, server_name):
-    state_map = [
-        ('waiting_name', "Введите фамилию персонажа:"),
-        ('waiting_surname', "Введите национальность персонажа:"),
-        ('waiting_nationality', "Введите возраст персонажа (числом):"),
-        ('waiting_age', "Укажите пол персонажа:", True),
-        ('waiting_gender', "Детство персонажа:"),
-        ('waiting_childhood', "Юность персонажа:"),
-        ('waiting_youth', "Взрослая жизнь персонажа:"),
-        ('waiting_adult', "Наше время персонажа:"),
-    ]
-    current_state = await state.get_state()
-    idx = [s[0] for s in state_map].index(current_state.split(":")[-1])
-    field_names = ['name', 'surname', 'nationality', 'age', 'gender', 'childhood', 'youth', 'adult', 'present']
-    if idx == 3:  # возраст -> кнопки пола
-        try:
-            age = int(message.text.strip())
-        except:
-            await message.answer("Укажите возраст числом.")
-            return
-        await state.update_data(age=age)
-        kb = ReplyKeyboardMarkup(
-            keyboard=[
-                [KeyboardButton(text="Мужской")],
-                [KeyboardButton(text="Женский")],
-                [KeyboardButton(text="🏠 Главное меню")],
-            ],
-            resize_keyboard=True,
-            one_time_keyboard=True
-        )
-        await state.set_state(getattr(bio_states, "waiting_gender"))
-        await message.answer("Укажите пол персонажа:", reply_markup=kb)
-        return
-    if idx == 4:  # пол
-        if message.text == "🏠 Главное меню":
-            await cmd_start(message, state)
-            return
-        gender = message.text.strip()
-        if gender.lower() not in ["мужской", "женский"]:
-            await message.answer("Пожалуйста, выберите пол кнопкой ниже.")
-            return
-        await state.update_data(gender=gender.capitalize())
-        await state.set_state(getattr(bio_states, "waiting_childhood"))
-        await message.answer("Детство персонажа:")
-        return
-    if idx < len(state_map) - 1:
-        await state.update_data(**{field_names[idx]: message.text.strip()})
-        await state.set_state(getattr(bio_states, state_map[idx+1][0]))
-        await message.answer(state_map[idx+1][1])
-    else:
-        await state.update_data(present=message.text.strip())
-        data = await state.get_data()
-        bio = default_generate_bio(data)
-        await message.answer(
-            f"<b>Ваша анкета для {server_name}:</b>\n\n" + bio,
-            reply_markup=main_menu_kb, parse_mode="HTML"
-        )
-        await state.set_state(MenuStates.waiting_main_menu)
-
-# FSM для обычных серверов (универсальный обработчик)
-for bio_states, server_name in [
-    (RedBioStates, "RED"), (GreenBioStates, "GREEN"), (BlueBioStates, "BLUE"), (YellowBioStates, "YELLOW"),
-    (OrangeBioStates, "ORANGE"), (PinkBioStates, "PINK"), (BrownBioStates, "BROWN"),
-    (CyanBioStates, "CYAN"), (WhiteBioStates, "WHITE")
-]:
-    for field in ["waiting_name", "waiting_surname", "waiting_nationality", "waiting_age", "waiting_gender",
-                  "waiting_childhood", "waiting_youth", "waiting_adult", "waiting_present"]:
-        dp.message.register(lambda m, s, b=bio_states, n=server_name: universal_fsm(m, s, b, n), getattr(bio_states, field))
-
-# ---------------------- PURPLE FSM ----------------------
-
-@dp.message(PurpleBioStates.waiting_nickname)
-async def purple_nickname(message: types.Message, state: FSMContext):
-    nickname = message.text.strip()
-    if "_" in nickname or len(nickname.split()) != 2:
-        await message.answer(
-            "⚠️ Никнейм должен быть строго в формате 'Имя Фамилия' через пробел, без подчёркиваний. Пример: Sander Kligan"
+            "📝 Введите игровой никнейм (строго формат 'Имя Фамилия', например Sander Kligan):",
+            reply_markup=exit_kb
         )
         return
-    await state.update_data(nickname=nickname)
-    await state.set_state(PurpleBioStates.waiting_nationality)
-    await message.answer("2️⃣ Укажите национальность персонажа:")
+    # Универсальные сервера
+    for idx, cb in enumerate(server_callbacks):
+        if cdata == cb and cb != "server_purple":
+            await state.clear()
+            await state.set_state(UniversalBioStates.waiting_name)
+            await state.update_data(server=server_names[idx])
+            await callback.message.answer("Введите имя персонажа:", reply_markup=exit_kb)
+            return
 
-@dp.message(PurpleBioStates.waiting_nationality)
-async def purple_nationality(message: types.Message, state: FSMContext):
+# --- UNIVERSAL FSM ---
+
+@dp.message(UniversalBioStates.waiting_name)
+async def universal_name(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    await state.update_data(name=message.text.strip().capitalize())
+    await state.set_state(UniversalBioStates.waiting_surname)
+    await message.answer("Введите фамилию персонажа:", reply_markup=exit_kb)
+
+@dp.message(UniversalBioStates.waiting_surname)
+async def universal_surname(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    await state.update_data(surname=message.text.strip().capitalize())
+    await state.set_state(UniversalBioStates.waiting_nationality)
+    await message.answer("Введите национальность персонажа:", reply_markup=exit_kb)
+
+@dp.message(UniversalBioStates.waiting_nationality)
+async def universal_nationality(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
     await state.update_data(nationality=message.text.strip().capitalize())
-    await state.set_state(PurpleBioStates.waiting_age)
-    await message.answer("3️⃣ Укажите возраст персонажа (от 16 до 65):")
+    await state.set_state(UniversalBioStates.waiting_age)
+    await message.answer("Введите возраст персонажа (от 16 до 65):", reply_markup=exit_kb)
 
-@dp.message(PurpleBioStates.waiting_age)
-async def purple_age(message: types.Message, state: FSMContext):
+@dp.message(UniversalBioStates.waiting_age)
+async def universal_age(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
     try:
         age = int(message.text.strip())
         if age < 16 or age > 65:
             raise ValueError
     except:
-        await message.answer("⚠️ Укажите возраст числом от 16 до 65.")
+        await message.answer("Укажите возраст числом от 16 до 65.", reply_markup=exit_kb)
+        return
+    await state.update_data(age=age)
+    kb = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Мужской")],
+            [KeyboardButton(text="Женский")],
+            [KeyboardButton(text="🏠 Главное меню")],
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+    await state.set_state(UniversalBioStates.waiting_gender)
+    await message.answer("Укажите пол персонажа:", reply_markup=kb)
+
+@dp.message(UniversalBioStates.waiting_gender)
+async def universal_gender(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    gender = message.text.strip()
+    if gender.lower() not in ["мужской", "женский"]:
+        await message.answer("Пожалуйста, выберите пол кнопкой ниже.", reply_markup=exit_kb)
+        return
+    await state.update_data(gender=gender.capitalize())
+    await state.set_state(UniversalBioStates.waiting_childhood)
+    await message.answer("Опиши детство персонажа (или просто отправь любой текст):", reply_markup=exit_kb)
+
+@dp.message(UniversalBioStates.waiting_childhood)
+async def universal_childhood(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    await state.update_data(childhood=message.text.strip())
+    await state.set_state(UniversalBioStates.waiting_youth)
+    await message.answer("Опиши юность персонажа (или просто отправь любой текст):", reply_markup=exit_kb)
+
+@dp.message(UniversalBioStates.waiting_youth)
+async def universal_youth(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    await state.update_data(youth=message.text.strip())
+    await state.set_state(UniversalBioStates.waiting_adult)
+    await message.answer("Опиши взрослую жизнь персонажа (или просто отправь любой текст):", reply_markup=exit_kb)
+
+@dp.message(UniversalBioStates.waiting_adult)
+async def universal_adult(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    await state.update_data(adult=message.text.strip())
+    await state.set_state(UniversalBioStates.waiting_present)
+    await message.answer("Опиши текущее состояние персонажа (или просто отправь любой текст):", reply_markup=exit_kb)
+
+@dp.message(UniversalBioStates.waiting_present)
+async def universal_present(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    await state.update_data(present=message.text.strip())
+    data = await state.get_data()
+    bio = universal_generate_bio(data, data.get("server", ""))
+    await message.answer(
+        f"<b>Ваша подробная анкета для сервера {data.get('server', '').upper()}:</b>\n\n" + bio,
+        reply_markup=main_menu_kb, parse_mode="HTML"
+    )
+    await state.set_state(MenuStates.waiting_main_menu)
+
+# --- PURPLE FSM ---
+
+@dp.message(PurpleBioStates.waiting_nickname)
+async def purple_nickname(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    nickname = message.text.strip()
+    if "_" in nickname or len(nickname.split()) != 2:
+        await message.answer(
+            "⚠️ Никнейм должен быть строго в формате 'Имя Фамилия' через пробел, без подчёркиваний. Пример: Sander Kligan",
+            reply_markup=exit_kb
+        )
+        return
+    await state.update_data(nickname=nickname)
+    await state.set_state(PurpleBioStates.waiting_nationality)
+    await message.answer("2️⃣ Укажите национальность персонажа:", reply_markup=exit_kb)
+
+@dp.message(PurpleBioStates.waiting_nationality)
+async def purple_nationality(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    await state.update_data(nationality=message.text.strip().capitalize())
+    await state.set_state(PurpleBioStates.waiting_age)
+    await message.answer("3️⃣ Укажите возраст персонажа (от 16 до 65):", reply_markup=exit_kb)
+
+@dp.message(PurpleBioStates.waiting_age)
+async def purple_age(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    try:
+        age = int(message.text.strip())
+        if age < 16 or age > 65:
+            raise ValueError
+    except:
+        await message.answer("⚠️ Укажите возраст числом от 16 до 65.", reply_markup=exit_kb)
         return
     await state.update_data(age=age)
     kb = ReplyKeyboardMarkup(
@@ -486,15 +469,15 @@ async def purple_gender(message: types.Message, state: FSMContext):
         return
     gender = message.text.strip()
     if gender.lower() not in ["мужской", "женский"]:
-        await message.answer("Пожалуйста, выберите пол кнопкой ниже.")
+        await message.answer("Пожалуйста, выберите пол кнопкой ниже.", reply_markup=exit_kb)
         return
     await state.update_data(gender=gender.capitalize())
     data = await state.get_data()
     bio = purple_generate_bio(data)
-    await message.answer("<b>Ваша уникальная RP-биография для сервера PURPLE:</b>\n\n" + bio, reply_markup=main_menu_kb, parse_mode="HTML")
+    await message.answer("<b>Ваша подробная RP-биография для сервера PURPLE:</b>\n\n" + bio, reply_markup=main_menu_kb, parse_mode="HTML")
     await state.set_state(MenuStates.waiting_main_menu)
 
-# ------------- Запуск -------------
+# --- ЗАПУСК ---
 
 async def main():
     await dp.start_polling(bot)
