@@ -22,9 +22,11 @@ storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 router = Router()
 
-# Настройки DeepSeek API
-openai.api_base = "https://api.deepseek.com/v1"
-openai.api_key = DEEPSEEK_API_KEY
+# Создание клиента OpenAI для DeepSeek
+client = openai.OpenAI(
+    api_key=DEEPSEEK_API_KEY,
+    base_url="https://api.deepseek.com/v1"
+)
 
 # Клавиатура меню
 menu_kb = ReplyKeyboardMarkup(
@@ -87,12 +89,12 @@ async def bio_nationality(message: types.Message, state: FSMContext):
         f"Национальность: {data['nationality']}\n"
         "Остальные пункты (детство, юность, настоящее, характер, семья, хобби, внешность и т.д.) придумай сам, соблюдая правило написания от первого лица, без сверхспособностей, без известных личностей, без ошибок. Минимум 10 строк на раздел детство, юность, настоящее.\n"
         "Шаблон:\n"
-        "ФИО:\nПол:\nДата рождения:\nВозраст:\nНациональность:\nМесто рождения:\nОбразование:\nОтношение к воинской службе(для мужчин):\nСемья:\nМесто проживания на момент проживания с родителями:\nОписание внешности:\nОсобенности характера:\nВаше фото:\nДетство(От десяти строк):\nЮность(От десяти строк):\nНастоящее время(От десяти строк):\nСемейное положение:\nМесто текущего проживания:.\nИмеется ли судимость?:\nВаше хобби:"
+        "ФИО:\nПол:\nДата рождения:\nВозраст:\nНациональность:\nМесто рождения:\nОбразование:\nОтношение к воинской службе(для мужчин):\nСемья:\nМесто проживания на момент проживания с родителями:\nОписание внешности:\nОсобенности характера:\nВаше фото:\nДетство(От десяти строк):\nЮность(От десяти строк):\нНастоящее время(От десяти строк):\nСемейное положение:\nМесто текущего проживания:.\nИмеется ли судимость?:\nВаше хобби:"
     )
     await message.answer("Генерирую биографию, подождите...")
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="deepseek-chat",
             messages=[
                 {"role": "system", "content": "Ты пишешь грамотные RP-биографии на русском языке по форумному шаблону."},
@@ -101,7 +103,7 @@ async def bio_nationality(message: types.Message, state: FSMContext):
             temperature=0.7,
             max_tokens=1200,
         )
-        bio_text = response.choices[0].message["content"]
+        bio_text = response.choices[0].message.content
     except Exception as e:
         await message.answer(f"Ошибка генерации биографии: {e}")
         return
