@@ -13,7 +13,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 logging.basicConfig(level=logging.INFO)
 
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+TELEGRAM_TOKEN = ("8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")
 if not TELEGRAM_TOKEN:
     TELEGRAM_TOKEN = getpass.getpass("Введите TELEGRAM_TOKEN: ")
 
