@@ -60,7 +60,6 @@ class BlueBioStates(StatesGroup):
     waiting_name = State()
     waiting_gender = State()
     waiting_age = State()
-    waiting_dob = State()
     waiting_nationality = State()
 
 # --- НАБОРЫ ДАННЫХ BLACK RUSSIA ---
@@ -202,8 +201,16 @@ def generate_birthdate(age: int) -> str:
 
 def random_date_of_birth(age: int):
     today = datetime.today()
-    birthday = today - timedelta(days=365*age + random.randint(-200, 200))
-    return birthday.strftime("%d.%m.%Y")
+    year = today.year - age
+    month = random.randint(1, 12)
+    if month == 2:
+        days = 29 if year % 4 == 0 else 28
+    elif month in [4, 6, 9, 11]:
+        days = 30
+    else:
+        days = 31
+    day = random.randint(1, days)
+    return f"{day:02d}.{month:02d}.{year}"
 
 def random_height():
     return f"{random.randint(165, 200)} см"
@@ -222,7 +229,7 @@ def generate_traits():
 def random_appearance():
     return random.choice(APPEARANCES)
 
-# ========== RED RP BIO (оставить как было ранее) ==========
+# ========== RED RP BIO ==========
 def generate_bio_red(data: dict) -> str:
     fio = data.get("fio", "Не указано")
     fam = fio.split()[-1] if len(fio.split()) > 1 else fio
@@ -257,7 +264,7 @@ def generate_bio_red(data: dict) -> str:
     )
     return result
 
-# ========== GREEN RP BIO (ФОРУМНЫЙ СТИЛЬ) ==========
+# ========== GREEN RP BIO ==========
 GREEN_CHILDHOOD = [
     "С самого рождения был окружён любовью родителей, которые делали всё, чтобы я вырос достойным человеком. Наш дом отличался уютом и теплом. Отец с детства учил меня ценить труд, а мама — быть добрым и справедливым. Я часто бывал с отцом на его работе и помогал маме в её кондитерской лавке. Уже в детстве понял: чтобы чего-то добиться, нужно много работать.",
     "Родился и вырос в городе {city}, окружённом живописной природой. Был энергичным мальчиком: с друзьями гулял на улице, исследовал лесные тропинки. В детском саду завёл много друзей, а в школе учёба давалась легко благодаря поддержке семьи, особенно бабушки, которая приучила меня к ответственности.",
@@ -366,7 +373,7 @@ def generate_bio_blue(data: dict) -> str:
     fio = data.get("fio", "Не указано")
     gender = data.get("gender", "Не указано")
     age = int(data.get("age", 18))
-    dob = data.get("dob", random_date_of_birth(age))
+    dob = random_date_of_birth(age)
     nationality = data.get("nationality", "Не указано")
     family = data.get("family", "Мама — Ирина Иванова, папа — Иван Иванов")
     appearance = data.get("appearance", "Высокий, спортивный, открытое лицо, карие глаза, аккуратная причёска.")
@@ -599,24 +606,8 @@ async def bluebio_age(message: types.Message, state: FSMContext):
         await message.answer("⚠️ Укажите возраст числом от 16 до 65.")
         return
     await state.update_data(age=age)
-    await state.set_state(BlueBioStates.waiting_dob)
-    await message.answer("<b>4️⃣ Укажите дату рождения персонажа (дд.мм.гггг):</b>\nПример: 01.01.2000", parse_mode="HTML")
-
-@dp.message(BlueBioStates.waiting_dob)
-async def bluebio_dob(message: types.Message, state: FSMContext):
-    if message.text == "🏠 Главное меню":
-        await cmd_start(message, state)
-        return
-    dob = message.text.strip()
-    # Допустимая дата: 01.01.1900 - 31.12.2025, просто базовая проверка
-    try:
-        datetime.strptime(dob, "%d.%m.%Y")
-    except Exception:
-        await message.answer("⚠️ Введите дату рождения в формате дд.мм.гггг. Например: 01.01.2000")
-        return
-    await state.update_data(dob=dob)
     await state.set_state(BlueBioStates.waiting_nationality)
-    await message.answer("<b>5️⃣ Укажите национальность персонажа:</b>", parse_mode="HTML")
+    await message.answer("<b>4️⃣ Укажите национальность персонажа:</b>", parse_mode="HTML")
 
 @dp.message(BlueBioStates.waiting_nationality)
 async def bluebio_nationality(message: types.Message, state: FSMContext):
@@ -626,6 +617,7 @@ async def bluebio_nationality(message: types.Message, state: FSMContext):
     nationality = message.text.strip().capitalize()
     await state.update_data(nationality=nationality)
     data = await state.get_data()
+    # Дата рождения рассчитывается автоматически по возрасту!
     bio = generate_bio_blue(data)
     await message.answer("<b>Ваша уникальная RP-биография для сервера BLUE:</b>\n\n" + bio, parse_mode="HTML", reply_markup=main_menu_kb)
     await state.set_state(MenuStates.waiting_main_menu)
