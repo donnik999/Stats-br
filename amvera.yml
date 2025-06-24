@@ -1,4 +1,2 @@
-entry: python bot.py
-requirements: requirements.txt
-env:
-  TELEGRAM_TOKEN: "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
+run:
+  cmd: python3 main.py
