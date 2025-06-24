@@ -24,8 +24,8 @@ dp = Dispatcher(storage=storage)
 # Главное меню
 main_menu_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton("📝 Создать РП-биографию")],
-        [KeyboardButton("📞 Связь с владельцем")]
+        [KeyboardButton(text="📝 Создать РП-биографию")],
+        [KeyboardButton(text="📞 Связь с владельцем")]
     ],
     resize_keyboard=True,
     one_time_keyboard=True
@@ -201,8 +201,13 @@ async def redbio_name(message: types.Message, state: FSMContext):
     await state.update_data(fio=fio)
     await state.set_state(RedBioStates.waiting_gender)
     kb = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton("Мужской")], [KeyboardButton("Женский")], [KeyboardButton("🏠 Главное меню")]],
-        resize_keyboard=True, one_time_keyboard=True
+        keyboard=[
+            [KeyboardButton(text="Мужской")],
+            [KeyboardButton(text="Женский")],
+            [KeyboardButton(text="🏠 Главное меню")]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
     )
     await message.answer("<b>2️⃣ Укажите пол персонажа:</b>", reply_markup=kb, parse_mode="HTML")
 
