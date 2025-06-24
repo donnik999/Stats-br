@@ -1,86 +1,71 @@
-import asyncio
+import os
 import logging
-import openai
-from aiogram import Bot, Dispatcher, Router, types, F
-from aiogram.filters import Command
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
+from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
+import openai
 
-# ====== ВСТАВЬ СВОИ ДАННЫЕ СЮДА ======
-TELEGRAM_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
-DEEPSEEK_API_KEY = "sk-fab5d466db514e5087656e9c49a7a03d"
-# =====================================
-
-# Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
-# Инициализация бота и диспетчера
+TELEGRAM_TOKEN = os.environ.get("8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")
+DEEPSEEK_API_KEY = os.environ.get("sk-fab5d466db514e5087656e9c49a7a03d")
+
 bot = Bot(token=TELEGRAM_TOKEN)
 storage = MemoryStorage()
-dp = Dispatcher(storage=storage)
-router = Router()
+dp = Dispatcher(bot, storage=storage)
 
-# Создание клиента OpenAI для DeepSeek (без proxies!)
-client = openai.OpenAI(
-    api_key=DEEPSEEK_API_KEY,
-    base_url="https://api.deepseek.com/v1"
-)
+openai.api_base = "https://api.deepseek.com/v1"
+openai.api_key = DEEPSEEK_API_KEY
 
 # Клавиатура меню
-menu_kb = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton(text="✍️ Написать РП биографию")]],
-    resize_keyboard=True
-)
+menu_kb = ReplyKeyboardMarkup(resize_keyboard=True)
+menu_kb.add(KeyboardButton("✍️ Написать РП биографию"))
 
-# FSM состояния для сбора данных
 class BioStates(StatesGroup):
     waiting_fio = State()
     waiting_age = State()
     waiting_gender = State()
     waiting_nationality = State()
 
-# /start
-@router.message(Command("start"))
+@dp.message_handler(commands=["start"])
 async def cmd_start(message: types.Message):
     text = (
-        "👋 Привет! Я бот для создания RP-биографий по шаблону.\n"
+        "👋 Привет! Я бот для генерации RP-биографий по шаблону.\n"
         "Нажми кнопку ниже, чтобы начать:"
     )
     await message.answer(text, reply_markup=menu_kb)
 
-# Кнопка меню
-@router.message(F.text == "✍️ Написать РП биографию")
-async def start_bio(message: types.Message, state: FSMContext):
-    await state.set_state(BioStates.waiting_fio)
-    await message.answer("Введите ФИО персонажа (пример: Иванов Иван Иванович):")
+@dp.message_handler(lambda m: m.text == "✍️ Написать РП биографию")
+async def start_bio(message: types.Message):
+    await BioStates.waiting_fio.set()
+    await message.answer("Введите ФИО персонажа (например: Иванов Иван Иванович):")
 
-@router.message(BioStates.waiting_fio)
+@dp.message_handler(state=BioStates.waiting_fio)
 async def bio_fio(message: types.Message, state: FSMContext):
     await state.update_data(fio=message.text)
-    await state.set_state(BioStates.waiting_age)
-    await message.answer("Введите возраст персонажа (18-65):")
+    await BioStates.waiting_age.set()
+    await message.answer("Введите возраст персонажа (например: 25):")
 
-@router.message(BioStates.waiting_age)
+@dp.message_handler(state=BioStates.waiting_age)
 async def bio_age(message: types.Message, state: FSMContext):
     await state.update_data(age=message.text)
-    await state.set_state(BioStates.waiting_gender)
+    await BioStates.waiting_gender.set()
     await message.answer("Укажите пол персонажа (Мужской/Женский):")
 
-@router.message(BioStates.waiting_gender)
+@dp.message_handler(state=BioStates.waiting_gender)
 async def bio_gender(message: types.Message, state: FSMContext):
     await state.update_data(gender=message.text)
-    await state.set_state(BioStates.waiting_nationality)
+    await BioStates.waiting_nationality.set()
     await message.answer("Укажите национальность персонажа:")
 
-@router.message(BioStates.waiting_nationality)
+@dp.message_handler(state=BioStates.waiting_nationality)
 async def bio_nationality(message: types.Message, state: FSMContext):
     await state.update_data(nationality=message.text)
     data = await state.get_data()
-    await state.clear()
+    await state.finish()
 
-    # Формируем промпт для DeepSeek
     prompt = (
         f"Напиши RP-биографию персонажа на форум по шаблону, используя такие данные:\n"
         f"ФИО: {data['fio']}\n"
@@ -94,7 +79,7 @@ async def bio_nationality(message: types.Message, state: FSMContext):
     await message.answer("Генерирую биографию, подождите...")
 
     try:
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="deepseek-chat",
             messages=[
                 {"role": "system", "content": "Ты пишешь грамотные RP-биографии на русском языке по форумному шаблону."},
@@ -103,18 +88,12 @@ async def bio_nationality(message: types.Message, state: FSMContext):
             temperature=0.7,
             max_tokens=1200,
         )
-        bio_text = response.choices[0].message.content
+        bio_text = response.choices[0].message["content"]
     except Exception as e:
         await message.answer(f"Ошибка генерации биографии: {e}")
         return
 
     await message.answer("Вот ваша RP-биография:\n\n" + bio_text)
 
-# Регистрация роутера
-dp.include_router(router)
-
-async def main():
-    await dp.start_polling(bot)
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    executor.start_polling(dp, skip_updates=True)
