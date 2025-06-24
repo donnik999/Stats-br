@@ -1,2 +1,2 @@
 aiogram>=3.0.0
-deepseek-openai>=0.13
+openai>=1.0.0
