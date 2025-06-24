@@ -1,39 +1,43 @@
+import asyncio
 import logging
-from aiogram import Bot, Dispatcher, executor, types
+import os
+from aiogram import Bot, Dispatcher, Router, types, F
+from aiogram.filters import Command
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from config import TELEGRAM_TOKEN, DEEPSEEK_API_KEY
 import openai
 
+from config import TELEGRAM_TOKEN, DEEPSEEK_API_KEY
+
+# Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token="8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")
-dp = Dispatcher(bot)
+# Создаем бота и диспетчер
+bot = Bot(token=TELEGRAM_TOKEN)
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
+router = Router()
 
 openai.api_base = "https://api.deepseek.com/v1"
-openai.api_key = sk-fab5d466db514e5087656e9c49a7a03d
+openai.api_key = DEEPSEEK_API_KEY
 
-# --- Клавиатуры ---
-menu_kb = ReplyKeyboardMarkup(resize_keyboard=True)
-menu_kb.add(KeyboardButton("✍️ Написать РП биографию"))
+# Клавиатура меню
+menu_kb = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="✍️ Написать РП биографию")]],
+    resize_keyboard=True
+)
 
-# --- Состояния пользователя ---
-from aiogram.dispatcher import FSMContext
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher.filters.state import State, StatesGroup
-
-storage = MemoryStorage()
-dp.storage = storage
-
+# FSM состояния
 class BioStates(StatesGroup):
     waiting_fio = State()
     waiting_age = State()
     waiting_gender = State()
     waiting_nationality = State()
 
-user_data = {}
-
-# --- Хендлеры ---
-@dp.message_handler(commands=["start"])
+# /start
+@router.message(Command("start"))
 async def cmd_start(message: types.Message):
     text = (
         "👋 Привет! Я бот для создания RP-биографий по шаблону.\n"
@@ -41,36 +45,37 @@ async def cmd_start(message: types.Message):
     )
     await message.answer(text, reply_markup=menu_kb)
 
-@dp.message_handler(lambda m: m.text == "✍️ Написать РП биографию")
-async def start_bio(message: types.Message):
-    await BioStates.waiting_fio.set()
+# Обработка кнопки
+@router.message(F.text == "✍️ Написать РП биографию")
+async def start_bio(message: types.Message, state: FSMContext):
+    await state.set_state(BioStates.waiting_fio)
     await message.answer("Введите ФИО персонажа (пример: Иванов Иван Иванович):")
 
-@dp.message_handler(state=BioStates.waiting_fio)
+@router.message(BioStates.waiting_fio)
 async def bio_fio(message: types.Message, state: FSMContext):
     await state.update_data(fio=message.text)
-    await BioStates.waiting_age.set()
+    await state.set_state(BioStates.waiting_age)
     await message.answer("Введите возраст персонажа (18-65):")
 
-@dp.message_handler(state=BioStates.waiting_age)
+@router.message(BioStates.waiting_age)
 async def bio_age(message: types.Message, state: FSMContext):
     await state.update_data(age=message.text)
-    await BioStates.waiting_gender.set()
+    await state.set_state(BioStates.waiting_gender)
     await message.answer("Укажите пол персонажа (Мужской/Женский):")
 
-@dp.message_handler(state=BioStates.waiting_gender)
+@router.message(BioStates.waiting_gender)
 async def bio_gender(message: types.Message, state: FSMContext):
     await state.update_data(gender=message.text)
-    await BioStates.waiting_nationality.set()
+    await state.set_state(BioStates.waiting_nationality)
     await message.answer("Укажите национальность персонажа:")
 
-@dp.message_handler(state=BioStates.waiting_nationality)
+@router.message(BioStates.waiting_nationality)
 async def bio_nationality(message: types.Message, state: FSMContext):
     await state.update_data(nationality=message.text)
     data = await state.get_data()
-    await state.finish()
+    await state.clear()
 
-    # Генерируем биографию через DeepSeek
+    # Генерация промпта для DeepSeek
     prompt = (
         f"Напиши RP-биографию персонажа на форум по шаблону, используя такие данные:\n"
         f"ФИО: {data['fio']}\n"
@@ -100,6 +105,11 @@ async def bio_nationality(message: types.Message, state: FSMContext):
 
     await message.answer("Вот ваша RP-биография:\n\n" + bio_text)
 
+# Регистрация роутера
+dp.include_router(router)
+
+async def main():
+    await dp.start_polling(bot)
+
 if __name__ == "__main__":
-    from aiogram import executor
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(main())
