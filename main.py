@@ -9,13 +9,56 @@ import asyncio
 
 API_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
 
-# --- СТАРТОВЫЕ СОСТОЯНИЯ И ГЛАВНОЕ МЕНЮ ---
+# ------------- Основные состояния FSM -------------
 
 class MenuStates(StatesGroup):
     waiting_main_menu = State()
     choosing_server = State()
 
-# --- СОСТОЯНИЯ ДЛЯ КАЖДОГО СЕРВЕРА ---
+# Обычные серверы (примерные FSM, их можно копипастить)
+class RedBioStates(StatesGroup):
+    waiting_name = State()
+    waiting_surname = State()
+    waiting_nationality = State()
+    waiting_age = State()
+    waiting_gender = State()
+    waiting_childhood = State()
+    waiting_youth = State()
+    waiting_adult = State()
+    waiting_present = State()
+
+class GreenBioStates(StatesGroup):
+    waiting_name = State()
+    waiting_surname = State()
+    waiting_nationality = State()
+    waiting_age = State()
+    waiting_gender = State()
+    waiting_childhood = State()
+    waiting_youth = State()
+    waiting_adult = State()
+    waiting_present = State()
+
+class BlueBioStates(StatesGroup):
+    waiting_name = State()
+    waiting_surname = State()
+    waiting_nationality = State()
+    waiting_age = State()
+    waiting_gender = State()
+    waiting_childhood = State()
+    waiting_youth = State()
+    waiting_adult = State()
+    waiting_present = State()
+
+class YellowBioStates(StatesGroup):
+    waiting_name = State()
+    waiting_surname = State()
+    waiting_nationality = State()
+    waiting_age = State()
+    waiting_gender = State()
+    waiting_childhood = State()
+    waiting_youth = State()
+    waiting_adult = State()
+    waiting_present = State()
 
 class OrangeBioStates(StatesGroup):
     waiting_name = State()
@@ -39,75 +82,75 @@ class PinkBioStates(StatesGroup):
     waiting_adult = State()
     waiting_present = State()
 
-class RedBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
-class BlueBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
-class GreenBioStates(StatesGroup):
-    waiting_name = State()
-    waiting_surname = State()
-    waiting_nationality = State()
-    waiting_age = State()
-    waiting_gender = State()
-    waiting_childhood = State()
-    waiting_youth = State()
-    waiting_adult = State()
-    waiting_present = State()
-
-# --- FSM для PURPLE ---
-
 class PurpleBioStates(StatesGroup):
     waiting_nickname = State()
     waiting_nationality = State()
     waiting_age = State()
     waiting_gender = State()
 
-# --- КНОПКИ ---
+class BrownBioStates(StatesGroup):
+    waiting_name = State()
+    waiting_surname = State()
+    waiting_nationality = State()
+    waiting_age = State()
+    waiting_gender = State()
+    waiting_childhood = State()
+    waiting_youth = State()
+    waiting_adult = State()
+    waiting_present = State()
+
+class CyanBioStates(StatesGroup):
+    waiting_name = State()
+    waiting_surname = State()
+    waiting_nationality = State()
+    waiting_age = State()
+    waiting_gender = State()
+    waiting_childhood = State()
+    waiting_youth = State()
+    waiting_adult = State()
+    waiting_present = State()
+
+class WhiteBioStates(StatesGroup):
+    waiting_name = State()
+    waiting_surname = State()
+    waiting_nationality = State()
+    waiting_age = State()
+    waiting_gender = State()
+    waiting_childhood = State()
+    waiting_youth = State()
+    waiting_adult = State()
+    waiting_present = State()
+
+# ------------- Кнопки -------------
 
 main_menu_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Создать РП-Биографию")],
+        [KeyboardButton(text="🌟 Создать РП-Биографию")],
+        [KeyboardButton(text="📩 Связь с разработчиком")]
     ],
     resize_keyboard=True
 )
 
-# Делаем инлайн-клавиатуру с 6 серверами, 2 колонки по 3
+# Список серверов в один столбик, по порядку создания
 server_names = [
-    "ORANGE", "PINK", "RED",
-    "BLUE", "GREEN", "PURPLE"
+    "RED", "GREEN", "BLUE", "YELLOW", "ORANGE",
+    "PINK", "PURPLE", "BROWN", "CYAN", "WHITE"
 ]
 server_callbacks = [
-    "server_orange", "server_pink", "server_red",
-    "server_blue", "server_green", "server_purple"
+    "server_red", "server_green", "server_blue", "server_yellow", "server_orange",
+    "server_pink", "server_purple", "server_brown", "server_cyan", "server_white"
 ]
 server_kb = InlineKeyboardMarkup(
+    inline_keyboard=[[InlineKeyboardButton(text=server_names[i], callback_data=server_callbacks[i])] for i in range(10)]
+)
+
+contact_kb = InlineKeyboardMarkup(
     inline_keyboard=[
-        [
-            InlineKeyboardButton(text=server_names[i], callback_data=server_callbacks[i]),
-            InlineKeyboardButton(text=server_names[i+3], callback_data=server_callbacks[i+3])
-        ] for i in range(3)
+        [InlineKeyboardButton(text="Написать разработчику", url="https://t.me/BUNKOC")]
     ]
 )
 
-# --- ГЕНЕРАЦИЯ ДЛЯ КАЖДОГО СЕРВЕРА ---
+# ------------- Генерация внешности и прочих данных -------------
 
 def random_appearance():
     heights = [str(h) + " см" for h in range(160, 201, 5)]
@@ -161,9 +204,9 @@ def random_date_of_birth(age: int):
     day = random.randint(1, days)
     return f"{day:02d}.{month:02d}.{year}"
 
-# --- ГЕНЕРАТОРЫ КОНКРЕТНЫХ АНКЕТ ---
+# ------------- Генераторы анкет -------------
 
-def orange_generate_bio(data):
+def default_generate_bio(data):
     return (
         f"Имя: {data['name']}\n"
         f"Фамилия: {data['surname']}\n"
@@ -177,18 +220,6 @@ def orange_generate_bio(data):
         f"Взрослая жизнь:\n{data['adult']}\n\n"
         f"Наше время:\n{data['present']}"
     )
-
-def pink_generate_bio(data):
-    return orange_generate_bio(data)
-
-def red_generate_bio(data):
-    return orange_generate_bio(data)
-
-def blue_generate_bio(data):
-    return orange_generate_bio(data)
-
-def green_generate_bio(data):
-    return orange_generate_bio(data)
 
 def purple_generate_bio(data):
     nickname = data.get("nickname", "Nick Name")
@@ -242,7 +273,7 @@ def purple_generate_bio(data):
         f"Наше время:\n{present}"
     )
 
-# --- FSM И ХЕНДЛЕРЫ ---
+# ------------- Хендлеры -------------
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
@@ -251,446 +282,163 @@ dp = Dispatcher()
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        "Добро пожаловать! Нажмите 'Создать РП-Биографию', чтобы начать.",
-        reply_markup=main_menu_kb
+        "<b>👋 Добро пожаловать в генератор РП-Биографий для всех серверов!</b>\n\n"
+        "Создай уникальную анкету для любого сервера и начни своё ролевое приключение!\n\n"
+        "ℹ️ <i>Если возникнут вопросы — жми кнопку связи ниже.</i>",
+        reply_markup=main_menu_kb,
+        parse_mode="HTML"
     )
     await state.set_state(MenuStates.waiting_main_menu)
 
 @dp.message(MenuStates.waiting_main_menu)
 async def menu_handler(message: types.Message, state: FSMContext):
-    if message.text == "Создать РП-Биографию":
+    if message.text == "🌟 Создать РП-Биографию":
         await message.answer(
-            "Выберите сервер, для которого хотите создать анкету:",
-            reply_markup=server_kb
+            "<b>Выберите сервер для создания биографии:</b>",
+            reply_markup=server_kb,
+            parse_mode="HTML"
         )
         await state.set_state(MenuStates.choosing_server)
+    elif message.text == "📩 Связь с разработчиком":
+        await message.answer(
+            "<b>Связаться с разработчиком:</b>\n"
+            "Напиши свои пожелания или вопросы — всегда открыт к обратной связи!",
+            reply_markup=contact_kb,
+            parse_mode="HTML"
+        )
     else:
-        await message.answer("Пожалуйста, нажмите 'Создать РП-Биографию'.")
+        await message.answer("Пожалуйста, воспользуйтесь меню ниже 👇")
 
 @dp.callback_query(MenuStates.choosing_server)
 async def choose_server(callback: types.CallbackQuery, state: FSMContext):
     cdata = callback.data
     await callback.answer()
-    if cdata == "server_orange":
-        await state.clear()
-        await state.set_state(OrangeBioStates.waiting_name)
-        await callback.message.answer("Введите имя персонажа:")
-    elif cdata == "server_pink":
-        await state.clear()
-        await state.set_state(PinkBioStates.waiting_name)
-        await callback.message.answer("Введите имя персонажа:")
-    elif cdata == "server_red":
+    # RED
+    if cdata == "server_red":
         await state.clear()
         await state.set_state(RedBioStates.waiting_name)
-        await callback.message.answer("Введите имя персонажа:")
-    elif cdata == "server_blue":
-        await state.clear()
-        await state.set_state(BlueBioStates.waiting_name)
-        await callback.message.answer("Введите имя персонажа:")
+        await callback.message.answer("📝 Введите имя персонажа:")
+    # GREEN
     elif cdata == "server_green":
         await state.clear()
         await state.set_state(GreenBioStates.waiting_name)
-        await callback.message.answer("Введите имя персонажа:")
+        await callback.message.answer("📝 Введите имя персонажа:")
+    # BLUE
+    elif cdata == "server_blue":
+        await state.clear()
+        await state.set_state(BlueBioStates.waiting_name)
+        await callback.message.answer("📝 Введите имя персонажа:")
+    # YELLOW
+    elif cdata == "server_yellow":
+        await state.clear()
+        await state.set_state(YellowBioStates.waiting_name)
+        await callback.message.answer("📝 Введите имя персонажа:")
+    # ORANGE
+    elif cdata == "server_orange":
+        await state.clear()
+        await state.set_state(OrangeBioStates.waiting_name)
+        await callback.message.answer("📝 Введите имя персонажа:")
+    # PINK
+    elif cdata == "server_pink":
+        await state.clear()
+        await state.set_state(PinkBioStates.waiting_name)
+        await callback.message.answer("📝 Введите имя персонажа:")
+    # PURPLE (уникальная логика)
     elif cdata == "server_purple":
         await state.clear()
         await state.set_state(PurpleBioStates.waiting_nickname)
         await callback.message.answer(
-            "1️⃣ Введите игровой никнейм (строго формат 'Имя Фамилия', например Sander Kligan):"
+            "📝 Введите игровой никнейм (строго формат 'Имя Фамилия', например Sander Kligan):"
         )
+    # BROWN
+    elif cdata == "server_brown":
+        await state.clear()
+        await state.set_state(BrownBioStates.waiting_name)
+        await callback.message.answer("📝 Введите имя персонажа:")
+    # CYAN
+    elif cdata == "server_cyan":
+        await state.clear()
+        await state.set_state(CyanBioStates.waiting_name)
+        await callback.message.answer("📝 Введите имя персонажа:")
+    # WHITE
+    elif cdata == "server_white":
+        await state.clear()
+        await state.set_state(WhiteBioStates.waiting_name)
+        await callback.message.answer("📝 Введите имя персонажа:")
+
+# ---------------------- UNIVERSAL FSM HANDLER (кроме PURPLE) ----------------------
+
+async def universal_fsm(message: types.Message, state: FSMContext, bio_states, server_name):
+    state_map = [
+        ('waiting_name', "Введите фамилию персонажа:"),
+        ('waiting_surname', "Введите национальность персонажа:"),
+        ('waiting_nationality', "Введите возраст персонажа (числом):"),
+        ('waiting_age', "Укажите пол персонажа:", True),
+        ('waiting_gender', "Детство персонажа:"),
+        ('waiting_childhood', "Юность персонажа:"),
+        ('waiting_youth', "Взрослая жизнь персонажа:"),
+        ('waiting_adult', "Наше время персонажа:"),
+    ]
+    current_state = await state.get_state()
+    idx = [s[0] for s in state_map].index(current_state.split(":")[-1])
+    field_names = ['name', 'surname', 'nationality', 'age', 'gender', 'childhood', 'youth', 'adult', 'present']
+    if idx == 3:  # возраст -> кнопки пола
+        try:
+            age = int(message.text.strip())
+        except:
+            await message.answer("Укажите возраст числом.")
+            return
+        await state.update_data(age=age)
+        kb = ReplyKeyboardMarkup(
+            keyboard=[
+                [KeyboardButton(text="Мужской")],
+                [KeyboardButton(text="Женский")],
+                [KeyboardButton(text="🏠 Главное меню")],
+            ],
+            resize_keyboard=True,
+            one_time_keyboard=True
+        )
+        await state.set_state(getattr(bio_states, "waiting_gender"))
+        await message.answer("Укажите пол персонажа:", reply_markup=kb)
+        return
+    if idx == 4:  # пол
+        if message.text == "🏠 Главное меню":
+            await cmd_start(message, state)
+            return
+        gender = message.text.strip()
+        if gender.lower() not in ["мужской", "женский"]:
+            await message.answer("Пожалуйста, выберите пол кнопкой ниже.")
+            return
+        await state.update_data(gender=gender.capitalize())
+        await state.set_state(getattr(bio_states, "waiting_childhood"))
+        await message.answer("Детство персонажа:")
+        return
+    if idx < len(state_map) - 1:
+        await state.update_data(**{field_names[idx]: message.text.strip()})
+        await state.set_state(getattr(bio_states, state_map[idx+1][0]))
+        await message.answer(state_map[idx+1][1])
     else:
-        await callback.message.answer("Этот сервер пока не реализован.")
+        await state.update_data(present=message.text.strip())
+        data = await state.get_data()
+        bio = default_generate_bio(data)
+        await message.answer(
+            f"<b>Ваша анкета для {server_name}:</b>\n\n" + bio,
+            reply_markup=main_menu_kb, parse_mode="HTML"
+        )
+        await state.set_state(MenuStates.waiting_main_menu)
 
-# --- ORANGE ---
-@dp.message(OrangeBioStates.waiting_name)
-async def orange_name(message: types.Message, state: FSMContext):
-    await state.update_data(name=message.text.strip().capitalize())
-    await state.set_state(OrangeBioStates.waiting_surname)
-    await message.answer("Введите фамилию персонажа:")
+# FSM для обычных серверов (универсальный обработчик)
+for bio_states, server_name in [
+    (RedBioStates, "RED"), (GreenBioStates, "GREEN"), (BlueBioStates, "BLUE"), (YellowBioStates, "YELLOW"),
+    (OrangeBioStates, "ORANGE"), (PinkBioStates, "PINK"), (BrownBioStates, "BROWN"),
+    (CyanBioStates, "CYAN"), (WhiteBioStates, "WHITE")
+]:
+    for field in ["waiting_name", "waiting_surname", "waiting_nationality", "waiting_age", "waiting_gender",
+                  "waiting_childhood", "waiting_youth", "waiting_adult", "waiting_present"]:
+        dp.message.register(lambda m, s, b=bio_states, n=server_name: universal_fsm(m, s, b, n), getattr(bio_states, field))
 
-@dp.message(OrangeBioStates.waiting_surname)
-async def orange_surname(message: types.Message, state: FSMContext):
-    await state.update_data(surname=message.text.strip().capitalize())
-    await state.set_state(OrangeBioStates.waiting_nationality)
-    await message.answer("Введите национальность:")
+# ---------------------- PURPLE FSM ----------------------
 
-@dp.message(OrangeBioStates.waiting_nationality)
-async def orange_nationality(message: types.Message, state: FSMContext):
-    await state.update_data(nationality=message.text.strip().capitalize())
-    await state.set_state(OrangeBioStates.waiting_age)
-    await message.answer("Введите возраст персонажа (числом):")
-
-@dp.message(OrangeBioStates.waiting_age)
-async def orange_age(message: types.Message, state: FSMContext):
-    try:
-        age = int(message.text.strip())
-    except:
-        await message.answer("Укажите возраст числом.")
-        return
-    await state.update_data(age=age)
-    kb = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Мужской")],
-            [KeyboardButton(text="Женский")],
-            [KeyboardButton(text="🏠 Главное меню")],
-        ],
-        resize_keyboard=True,
-        one_time_keyboard=True
-    )
-    await state.set_state(OrangeBioStates.waiting_gender)
-    await message.answer("Укажите пол персонажа:", reply_markup=kb)
-
-@dp.message(OrangeBioStates.waiting_gender)
-async def orange_gender(message: types.Message, state: FSMContext):
-    if message.text == "🏠 Главное меню":
-        await cmd_start(message, state)
-        return
-    gender = message.text.strip()
-    if gender.lower() not in ["мужской", "женский"]:
-        await message.answer("Выберите пол кнопкой ниже.")
-        return
-    await state.update_data(gender=gender.capitalize())
-    await state.set_state(OrangeBioStates.waiting_childhood)
-    await message.answer("Детство персонажа:")
-
-@dp.message(OrangeBioStates.waiting_childhood)
-async def orange_childhood(message: types.Message, state: FSMContext):
-    await state.update_data(childhood=message.text.strip())
-    await state.set_state(OrangeBioStates.waiting_youth)
-    await message.answer("Юность персонажа:")
-
-@dp.message(OrangeBioStates.waiting_youth)
-async def orange_youth(message: types.Message, state: FSMContext):
-    await state.update_data(youth=message.text.strip())
-    await state.set_state(OrangeBioStates.waiting_adult)
-    await message.answer("Взрослая жизнь персонажа:")
-
-@dp.message(OrangeBioStates.waiting_adult)
-async def orange_adult(message: types.Message, state: FSMContext):
-    await state.update_data(adult=message.text.strip())
-    await state.set_state(OrangeBioStates.waiting_present)
-    await message.answer("Наше время персонажа:")
-
-@dp.message(OrangeBioStates.waiting_present)
-async def orange_present(message: types.Message, state: FSMContext):
-    await state.update_data(present=message.text.strip())
-    data = await state.get_data()
-    bio = orange_generate_bio(data)
-    await message.answer("Ваша анкета для ORANGE:\n\n" + bio, reply_markup=main_menu_kb)
-    await state.set_state(MenuStates.waiting_main_menu)
-
-# --- PINK ---
-@dp.message(PinkBioStates.waiting_name)
-async def pink_name(message: types.Message, state: FSMContext):
-    await state.update_data(name=message.text.strip().capitalize())
-    await state.set_state(PinkBioStates.waiting_surname)
-    await message.answer("Введите фамилию персонажа:")
-
-@dp.message(PinkBioStates.waiting_surname)
-async def pink_surname(message: types.Message, state: FSMContext):
-    await state.update_data(surname=message.text.strip().capitalize())
-    await state.set_state(PinkBioStates.waiting_nationality)
-    await message.answer("Введите национальность:")
-
-@dp.message(PinkBioStates.waiting_nationality)
-async def pink_nationality(message: types.Message, state: FSMContext):
-    await state.update_data(nationality=message.text.strip().capitalize())
-    await state.set_state(PinkBioStates.waiting_age)
-    await message.answer("Введите возраст персонажа (числом):")
-
-@dp.message(PinkBioStates.waiting_age)
-async def pink_age(message: types.Message, state: FSMContext):
-    try:
-        age = int(message.text.strip())
-    except:
-        await message.answer("Укажите возраст числом.")
-        return
-    await state.update_data(age=age)
-    kb = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Мужской")],
-            [KeyboardButton(text="Женский")],
-            [KeyboardButton(text="🏠 Главное меню")],
-        ],
-        resize_keyboard=True,
-        one_time_keyboard=True
-    )
-    await state.set_state(PinkBioStates.waiting_gender)
-    await message.answer("Укажите пол персонажа:", reply_markup=kb)
-
-@dp.message(PinkBioStates.waiting_gender)
-async def pink_gender(message: types.Message, state: FSMContext):
-    if message.text == "🏠 Главное меню":
-        await cmd_start(message, state)
-        return
-    gender = message.text.strip()
-    if gender.lower() not in ["мужской", "женский"]:
-        await message.answer("Выберите пол кнопкой ниже.")
-        return
-    await state.update_data(gender=gender.capitalize())
-    await state.set_state(PinkBioStates.waiting_childhood)
-    await message.answer("Детство персонажа:")
-
-@dp.message(PinkBioStates.waiting_childhood)
-async def pink_childhood(message: types.Message, state: FSMContext):
-    await state.update_data(childhood=message.text.strip())
-    await state.set_state(PinkBioStates.waiting_youth)
-    await message.answer("Юность персонажа:")
-
-@dp.message(PinkBioStates.waiting_youth)
-async def pink_youth(message: types.Message, state: FSMContext):
-    await state.update_data(youth=message.text.strip())
-    await state.set_state(PinkBioStates.waiting_adult)
-    await message.answer("Взрослая жизнь персонажа:")
-
-@dp.message(PinkBioStates.waiting_adult)
-async def pink_adult(message: types.Message, state: FSMContext):
-    await state.update_data(adult=message.text.strip())
-    await state.set_state(PinkBioStates.waiting_present)
-    await message.answer("Наше время персонажа:")
-
-@dp.message(PinkBioStates.waiting_present)
-async def pink_present(message: types.Message, state: FSMContext):
-    await state.update_data(present=message.text.strip())
-    data = await state.get_data()
-    bio = pink_generate_bio(data)
-    await message.answer("Ваша анкета для PINK:\n\n" + bio, reply_markup=main_menu_kb)
-    await state.set_state(MenuStates.waiting_main_menu)
-
-# --- RED ---
-@dp.message(RedBioStates.waiting_name)
-async def red_name(message: types.Message, state: FSMContext):
-    await state.update_data(name=message.text.strip().capitalize())
-    await state.set_state(RedBioStates.waiting_surname)
-    await message.answer("Введите фамилию персонажа:")
-
-@dp.message(RedBioStates.waiting_surname)
-async def red_surname(message: types.Message, state: FSMContext):
-    await state.update_data(surname=message.text.strip().capitalize())
-    await state.set_state(RedBioStates.waiting_nationality)
-    await message.answer("Введите национальность:")
-
-@dp.message(RedBioStates.waiting_nationality)
-async def red_nationality(message: types.Message, state: FSMContext):
-    await state.update_data(nationality=message.text.strip().capitalize())
-    await state.set_state(RedBioStates.waiting_age)
-    await message.answer("Введите возраст персонажа (числом):")
-
-@dp.message(RedBioStates.waiting_age)
-async def red_age(message: types.Message, state: FSMContext):
-    try:
-        age = int(message.text.strip())
-    except:
-        await message.answer("Укажите возраст числом.")
-        return
-    await state.update_data(age=age)
-    kb = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Мужской")],
-            [KeyboardButton(text="Женский")],
-            [KeyboardButton(text="🏠 Главное меню")],
-        ],
-        resize_keyboard=True,
-        one_time_keyboard=True
-    )
-    await state.set_state(RedBioStates.waiting_gender)
-    await message.answer("Укажите пол персонажа:", reply_markup=kb)
-
-@dp.message(RedBioStates.waiting_gender)
-async def red_gender(message: types.Message, state: FSMContext):
-    if message.text == "🏠 Главное меню":
-        await cmd_start(message, state)
-        return
-    gender = message.text.strip()
-    if gender.lower() not in ["мужской", "женский"]:
-        await message.answer("Выберите пол кнопкой ниже.")
-        return
-    await state.update_data(gender=gender.capitalize())
-    await state.set_state(RedBioStates.waiting_childhood)
-    await message.answer("Детство персонажа:")
-
-@dp.message(RedBioStates.waiting_childhood)
-async def red_childhood(message: types.Message, state: FSMContext):
-    await state.update_data(childhood=message.text.strip())
-    await state.set_state(RedBioStates.waiting_youth)
-    await message.answer("Юность персонажа:")
-
-@dp.message(RedBioStates.waiting_youth)
-async def red_youth(message: types.Message, state: FSMContext):
-    await state.update_data(youth=message.text.strip())
-    await state.set_state(RedBioStates.waiting_adult)
-    await message.answer("Взрослая жизнь персонажа:")
-
-@dp.message(RedBioStates.waiting_adult)
-async def red_adult(message: types.Message, state: FSMContext):
-    await state.update_data(adult=message.text.strip())
-    await state.set_state(RedBioStates.waiting_present)
-    await message.answer("Наше время персонажа:")
-
-@dp.message(RedBioStates.waiting_present)
-async def red_present(message: types.Message, state: FSMContext):
-    await state.update_data(present=message.text.strip())
-    data = await state.get_data()
-    bio = red_generate_bio(data)
-    await message.answer("Ваша анкета для RED:\n\n" + bio, reply_markup=main_menu_kb)
-    await state.set_state(MenuStates.waiting_main_menu)
-
-# --- BLUE ---
-@dp.message(BlueBioStates.waiting_name)
-async def blue_name(message: types.Message, state: FSMContext):
-    await state.update_data(name=message.text.strip().capitalize())
-    await state.set_state(BlueBioStates.waiting_surname)
-    await message.answer("Введите фамилию персонажа:")
-
-@dp.message(BlueBioStates.waiting_surname)
-async def blue_surname(message: types.Message, state: FSMContext):
-    await state.update_data(surname=message.text.strip().capitalize())
-    await state.set_state(BlueBioStates.waiting_nationality)
-    await message.answer("Введите национальность:")
-
-@dp.message(BlueBioStates.waiting_nationality)
-async def blue_nationality(message: types.Message, state: FSMContext):
-    await state.update_data(nationality=message.text.strip().capitalize())
-    await state.set_state(BlueBioStates.waiting_age)
-    await message.answer("Введите возраст персонажа (числом):")
-
-@dp.message(BlueBioStates.waiting_age)
-async def blue_age(message: types.Message, state: FSMContext):
-    try:
-        age = int(message.text.strip())
-    except:
-        await message.answer("Укажите возраст числом.")
-        return
-    await state.update_data(age=age)
-    kb = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Мужской")],
-            [KeyboardButton(text="Женский")],
-            [KeyboardButton(text="🏠 Главное меню")],
-        ],
-        resize_keyboard=True,
-        one_time_keyboard=True
-    )
-    await state.set_state(BlueBioStates.waiting_gender)
-    await message.answer("Укажите пол персонажа:", reply_markup=kb)
-
-@dp.message(BlueBioStates.waiting_gender)
-async def blue_gender(message: types.Message, state: FSMContext):
-    if message.text == "🏠 Главное меню":
-        await cmd_start(message, state)
-        return
-    gender = message.text.strip()
-    if gender.lower() not in ["мужской", "женский"]:
-        await message.answer("Выберите пол кнопкой ниже.")
-        return
-    await state.update_data(gender=gender.capitalize())
-    await state.set_state(BlueBioStates.waiting_childhood)
-    await message.answer("Детство персонажа:")
-
-@dp.message(BlueBioStates.waiting_childhood)
-async def blue_childhood(message: types.Message, state: FSMContext):
-    await state.update_data(childhood=message.text.strip())
-    await state.set_state(BlueBioStates.waiting_youth)
-    await message.answer("Юность персонажа:")
-
-@dp.message(BlueBioStates.waiting_youth)
-async def blue_youth(message: types.Message, state: FSMContext):
-    await state.update_data(youth=message.text.strip())
-    await state.set_state(BlueBioStates.waiting_adult)
-    await message.answer("Взрослая жизнь персонажа:")
-
-@dp.message(BlueBioStates.waiting_adult)
-async def blue_adult(message: types.Message, state: FSMContext):
-    await state.update_data(adult=message.text.strip())
-    await state.set_state(BlueBioStates.waiting_present)
-    await message.answer("Наше время персонажа:")
-
-@dp.message(BlueBioStates.waiting_present)
-async def blue_present(message: types.Message, state: FSMContext):
-    await state.update_data(present=message.text.strip())
-    data = await state.get_data()
-    bio = blue_generate_bio(data)
-    await message.answer("Ваша анкета для BLUE:\n\n" + bio, reply_markup=main_menu_kb)
-    await state.set_state(MenuStates.waiting_main_menu)
-
-# --- GREEN ---
-@dp.message(GreenBioStates.waiting_name)
-async def green_name(message: types.Message, state: FSMContext):
-    await state.update_data(name=message.text.strip().capitalize())
-    await state.set_state(GreenBioStates.waiting_surname)
-    await message.answer("Введите фамилию персонажа:")
-
-@dp.message(GreenBioStates.waiting_surname)
-async def green_surname(message: types.Message, state: FSMContext):
-    await state.update_data(surname=message.text.strip().capitalize())
-    await state.set_state(GreenBioStates.waiting_nationality)
-    await message.answer("Введите национальность:")
-
-@dp.message(GreenBioStates.waiting_nationality)
-async def green_nationality(message: types.Message, state: FSMContext):
-    await state.update_data(nationality=message.text.strip().capitalize())
-    await state.set_state(GreenBioStates.waiting_age)
-    await message.answer("Введите возраст персонажа (числом):")
-
-@dp.message(GreenBioStates.waiting_age)
-async def green_age(message: types.Message, state: FSMContext):
-    try:
-        age = int(message.text.strip())
-    except:
-        await message.answer("Укажите возраст числом.")
-        return
-    await state.update_data(age=age)
-    kb = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Мужской")],
-            [KeyboardButton(text="Женский")],
-            [KeyboardButton(text="🏠 Главное меню")],
-        ],
-        resize_keyboard=True,
-        one_time_keyboard=True
-    )
-    await state.set_state(GreenBioStates.waiting_gender)
-    await message.answer("Укажите пол персонажа:", reply_markup=kb)
-
-@dp.message(GreenBioStates.waiting_gender)
-async def green_gender(message: types.Message, state: FSMContext):
-    if message.text == "🏠 Главное меню":
-        await cmd_start(message, state)
-        return
-    gender = message.text.strip()
-    if gender.lower() not in ["мужской", "женский"]:
-        await message.answer("Выберите пол кнопкой ниже.")
-        return
-    await state.update_data(gender=gender.capitalize())
-    await state.set_state(GreenBioStates.waiting_childhood)
-    await message.answer("Детство персонажа:")
-
-@dp.message(GreenBioStates.waiting_childhood)
-async def green_childhood(message: types.Message, state: FSMContext):
-    await state.update_data(childhood=message.text.strip())
-    await state.set_state(GreenBioStates.waiting_youth)
-    await message.answer("Юность персонажа:")
-
-@dp.message(GreenBioStates.waiting_youth)
-async def green_youth(message: types.Message, state: FSMContext):
-    await state.update_data(youth=message.text.strip())
-    await state.set_state(GreenBioStates.waiting_adult)
-    await message.answer("Взрослая жизнь персонажа:")
-
-@dp.message(GreenBioStates.waiting_adult)
-async def green_adult(message: types.Message, state: FSMContext):
-    await state.update_data(adult=message.text.strip())
-    await state.set_state(GreenBioStates.waiting_present)
-    await message.answer("Наше время персонажа:")
-
-@dp.message(GreenBioStates.waiting_present)
-async def green_present(message: types.Message, state: FSMContext):
-    await state.update_data(present=message.text.strip())
-    data = await state.get_data()
-    bio = green_generate_bio(data)
-    await message.answer("Ваша анкета для GREEN:\n\n" + bio, reply_markup=main_menu_kb)
-    await state.set_state(MenuStates.waiting_main_menu)
-
-# --- PURPLE ---
 @dp.message(PurpleBioStates.waiting_nickname)
 async def purple_nickname(message: types.Message, state: FSMContext):
     nickname = message.text.strip()
@@ -743,10 +491,10 @@ async def purple_gender(message: types.Message, state: FSMContext):
     await state.update_data(gender=gender.capitalize())
     data = await state.get_data()
     bio = purple_generate_bio(data)
-    await message.answer("Ваша уникальная RP-биография для сервера PURPLE:\n\n" + bio, reply_markup=main_menu_kb)
+    await message.answer("<b>Ваша уникальная RP-биография для сервера PURPLE:</b>\n\n" + bio, reply_markup=main_menu_kb, parse_mode="HTML")
     await state.set_state(MenuStates.waiting_main_menu)
 
-# --- ЗАПУСК ---
+# ------------- Запуск -------------
 
 async def main():
     await dp.start_polling(bot)
