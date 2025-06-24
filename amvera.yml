@@ -1,2 +1,8 @@
-run:
-  cmd: python3 main.py
+entrypoint: python bot/main.py
+env:
+  - API_TOKEN=${{secrets.8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw}}
+requirements:
+  - aiogram==3.0.0
+  - aiohttp
+  - beautifulsoup4
+  - lxml
