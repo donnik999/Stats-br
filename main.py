@@ -3,9 +3,10 @@ import random
 import logging
 import getpass
 import asyncio
+from datetime import datetime
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -25,37 +26,23 @@ menu_kb = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
-gender_kb = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Мужской"), KeyboardButton(text="Женский")]
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
-
 class BioStates(StatesGroup):
     waiting_fio = State()
     waiting_age = State()
     waiting_nationality = State()
-    waiting_gender = State()
-
-# ----------------- Справочники ------------------
 
 CITIES = [
     "Арзамас", "Южный", "Батырево", "Лыткарино", "Морское",
     "Бусаево", "Горки", "Новый Арзамас", "Приволжск"
 ]
-
 STREETS = [
     "Центральная", "Лесная", "Советская", "Солнечная", "Молодёжная",
     "Шоссейная", "Парковая", "Победы", "Гагарина", "Мира",
     "Озерная", "Набережная", "Заречная", "Трудовая", "Северная"
 ]
-
 ORGANIZATIONS = [
     "СМИ", "Центральная Больница", "ГИБДД", "УМВД", "ФСБ", "Правительство", "ФСИН"
 ]
-
 JOBS = [
     "рыболов", "таксист", "водолаз", "строитель", "заместитель строителя", "сотрудник МЧС",
     "работник шахты", "работник на заводе", "работник на ферме", "кладоискатель",
@@ -70,11 +57,27 @@ def generate_address():
     address = f"г. {city}, ул. {street}, д. {house}, кв. {apt}"
     return address, city
 
+def generate_birthdate(age: int) -> str:
+    # Текущий год
+    now = datetime.now()
+    year = now.year - age
+    # Рандомный месяц (1-12)
+    month = random.randint(1, 12)
+    # Количество дней в месяце (упрощённо, февраль всегда 28)
+    days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    day = random.randint(1, days_in_month[month - 1])
+    # Формат: 02 июня 2000
+    months_ru = [
+        "января", "февраля", "марта", "апреля", "мая", "июня",
+        "июля", "августа", "сентября", "октября", "ноября", "декабря"
+    ]
+    return f"{day:02d} {months_ru[month - 1]} {year} г."
+
 def generate_bio(data: dict) -> str:
     fio = data.get("fio", "Не указано")
-    age = data.get("age", "Не указано")
+    age = int(data.get("age", 18))
     nationality = data.get("nationality", "Не указано")
-    gender = data.get("gender", "Мужской")  # по умолчанию мужской
+    gender = random.choice(["Мужской", "Женский"])
     education = random.choice([
         "Среднее общее", "Средне-специальное", "Высшее", "Техническое", "Юридическое", "Медицинское"
     ])
@@ -82,51 +85,32 @@ def generate_bio(data: dict) -> str:
     job = random.choice(JOBS)
     address, city = generate_address()
     parent_address, _ = generate_address()
-    army_status = (
-        random.choice([
-            "Проходил срочную службу, уволен в запас.",
-            "Службу не проходил по уважительной причине.",
-            "Проходил альтернативную гражданскую службу.",
-            "Проходил службу, получил благодарность от командования."
-        ])
-        if gender == "Мужской" else
-        "Не проходила военную службу."
-    )
+    army_status = random.choice([
+        "Проходил срочную службу, уволен в запас.",
+        "Службу не проходил по уважительной причине.",
+        "Проходил альтернативную гражданскую службу.",
+        "Проходил службу, получил благодарность от командования."
+    ])
     family = random.choice([
         "Отец — Александр, мать — Марина. Есть младшая сестра.",
         "Семья полная: родители и старший брат.",
         "Отец — ветеран, мать — преподаватель. Один ребёнок в семье.",
         "Мама — домохозяйка, отец — водитель. Братьев и сестёр нет."
     ])
-    appearance = (
-        random.choice([
-            "Рост 180 см, спортивного телосложения, волосы тёмные, глаза карие.",
-            "Среднего роста, крепкое телосложение, светлые волосы, голубые глаза.",
-            "Крупного телосложения, волосы русые, глаза зелёные.",
-            "Рост 175 см, тёмные волосы, аккуратная борода, открытый взгляд."
-        ]) if gender == "Мужской" else
-        random.choice([
-            "Среднего роста, стройная фигура, светлые волосы, зелёные глаза.",
-            "Рост 168 см, спортивное телосложение, длинные русые волосы, карие глаза.",
-            "Хрупкая, невысокого роста, тёмные волосы, сдержанный взгляд.",
-            "Рост 165 см, аккуратная причёска, выразительные черты лица, голубые глаза."
-        ])
-    )
+    appearance = random.choice([
+        "Рост 180 см, спортивного телосложения, волосы тёмные, глаза карие.",
+        "Среднего роста, крепкое телосложение, светлые волосы, голубые глаза.",
+        "Крупного телосложения, волосы русые, глаза зелёные.",
+        "Рост 175 см, тёмные волосы, аккуратная борода, открытый взгляд."
+    ])
     character = random.choice([
         "Спокойный, рассудительный, трудолюбивый, но умеет постоять за себя.",
         "Сдержанный, надёжный, дисциплинированный, не лезет в конфликты первым.",
         "Умный, целеустремлённый, внимательный, справедливый, общительный.",
         "Дружелюбный, амбициозный, честный, всегда готов помочь."
-    ]) if gender == "Мужской" else random.choice([
-        "Добрая, внимательная, целеустремлённая, всегда поддержит близких.",
-        "Сдержанная, рассудительная, умеет постоять за себя и друзей.",
-        "Ответственная, трудолюбивая, обладает сильным характером.",
-        "Общительная, отзывчивая, умеет слушать и давать советы."
     ])
     marital_status = random.choice([
         "Не женат.", "В отношениях.", "Женат.", "Разведён."
-    ]) if gender == "Мужской" else random.choice([
-        "Не замужем.", "В отношениях.", "Замужем.", "Разведена."
     ])
     is_convicted = random.choice([
         "Нет.", "Не судим.", "Судимости отсутствуют."
@@ -147,6 +131,7 @@ def generate_bio(data: dict) -> str:
         "Стал наставником для новых сотрудников.",
         ""
     ])
+    birthdate = generate_birthdate(age)
 
     childhood_blocks = [
         f"Я родился в городе {city}, в обычной семье. Родители всегда поддерживали мои начинания и прививали уважение к окружающим.",
@@ -187,7 +172,7 @@ def generate_bio(data: dict) -> str:
     result = (
         f"<b>ФИО:</b> {fio}\n"
         f"<b>Пол:</b> {gender}\n"
-        f"<b>Дата рождения:</b> Не указана\n"
+        f"<b>Дата рождения:</b> {birthdate}\n"
         f"<b>Возраст:</b> {age}\n"
         f"<b>Национальность:</b> {nationality}\n"
         f"<b>Место рождения:</b> {city}\n"
@@ -273,30 +258,11 @@ async def bio_age(message: types.Message, state: FSMContext):
 async def bio_nationality(message: types.Message, state: FSMContext):
     nationality = message.text.strip().capitalize()
     await state.update_data(nationality=nationality)
-    await state.set_state(BioStates.waiting_gender)
-    await message.answer(
-        "<b>4️⃣ Выберите пол персонажа:</b>",
-        reply_markup=gender_kb,
-        parse_mode="HTML"
-    )
-
-@dp.message(BioStates.waiting_gender)
-async def bio_gender(message: types.Message, state: FSMContext):
-    gender = message.text.strip()
-    if gender not in ("Мужской", "Женский"):
-        await message.answer(
-            "⚠️ <b>Пожалуйста, выберите пол с помощью кнопок: Мужской или Женский.</b>",
-            reply_markup=gender_kb,
-            parse_mode="HTML"
-        )
-        return
-    await state.update_data(gender=gender)
     data = await state.get_data()
     bio_text = generate_bio(data)
     await message.answer(
         "<b>Ваша уникальная RP-биография:</b>\n\n" + bio_text,
-        parse_mode="HTML",
-        reply_markup=menu_kb
+        parse_mode="HTML"
     )
     await state.clear()
 
