@@ -31,12 +31,13 @@ main_menu_kb = ReplyKeyboardMarkup(
     one_time_keyboard=True
 )
 
-# Клавиатура выбора сервера
+# Клавиатура выбора сервера (с YELLOW)
 server_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text="RED", callback_data="server_red")],
         [InlineKeyboardButton(text="GREEN", callback_data="server_green")],
-        [InlineKeyboardButton(text="BLUE", callback_data="server_blue")]
+        [InlineKeyboardButton(text="BLUE", callback_data="server_blue")],
+        [InlineKeyboardButton(text="YELLOW", callback_data="server_yellow")]
     ]
 )
 
@@ -57,6 +58,12 @@ class GreenBioStates(StatesGroup):
     waiting_nationality = State()
 
 class BlueBioStates(StatesGroup):
+    waiting_name = State()
+    waiting_gender = State()
+    waiting_age = State()
+    waiting_nationality = State()
+
+class YellowBioStates(StatesGroup):
     waiting_name = State()
     waiting_gender = State()
     waiting_age = State()
@@ -403,6 +410,86 @@ def generate_bio_blue(data: dict) -> str:
         f"<b>Хобби:</b> {hobby}"
     )
 
+# ========== YELLOW RP BIO ==========
+YELLOW_CHILDHOOD = [
+    "Мое детство прошло в небольшом городе, где все друг друга знали. Я был активным и любознательным ребенком — играл во дворе, катался на велосипеде, устраивал с друзьями состязания на скорость. Отец часто брал меня на рыбалку, а мама поддерживала любые мои увлечения, развивая мои таланты. В садике у меня было немало друзей, а воспитательница стала для меня второй мамой. В школе я был любознательным мальчиком, участвовал в олимпиадах, много читал. За шалости бывало получал выговор, но всегда оставался любимчиком класса.",
+    "Я родился в дружной семье, где меня окружали заботой и вниманием. Мои родители всегда старались дать мне все самое лучшее. С раннего детства я был очень энергичным: устраивал во дворе соревнования, играл в футбол, помогал родителям по хозяйству. Отец научил меня рыбалке, а мама поддерживала мои творческие увлечения. В школе учился хорошо, любил участвовать в конкурсах, иногда хулиганил с друзьями. Особое удовольствие мне доставляло чтение приключенческих книг.",
+]
+
+YELLOW_YOUTH_LIFE = [
+    "Юность была временем открытий и формирования характера. Я все больше увлекался спортом, особенно футболом — мы играли до темноты, забывая обо всем. В старших классах полюбил точные науки и решил связать свою жизнь с инженерией. Поступил в университет, где много учился и участвовал в проектах. После вуза устроился на работу мечты, научился ответственности и самостоятельности, начал путешествовать по разным странам, знакомился с интересными людьми и культурами.",
+    "В 18 лет я отправился в армию, где прошел через множество испытаний — служба закалила характер и научила принимать решения. После армии поступил на работу в силовые структуры, где быстро продвигался по службе благодаря упорству. Параллельно нашел любовь, создал семью, начал арендовать квартиру для будущих детей. Каждый этап взрослой жизни приносил новые знания и опыт, укрепляя веру в себя.",
+]
+
+YELLOW_PRESENT = [
+    "Сейчас я работаю по специальности, занимаюсь любимым делом и продолжаю учиться. Активно занимаюсь спортом, участвую в забегах, поддерживаю здоровье. Люблю путешествовать и открывать новые места. В кругу друзей и семьи черпаю вдохновение и силы, а в редкие минуты отдыха читаю или занимаюсь кулинарией. Чувствую себя уверенно и с оптимизмом смотрю в будущее.",
+    "Сегодня я счастливый семьянин, строю карьеру, воспитываю детей, продолжаю развиваться личностно и профессионально. Веду активную жизнь, бегаю, изучаю новые науки, отдыхаю на природе. Люблю проводить время с близкими, а хобби помогают мне отвлечься от рутины и получать радость от жизни.",
+]
+
+YELLOW_HOBBY = [
+    "Путешествия, спорт (особенно бег), чтение научной фантастики и нон-фикшн, фотография, кулинария, утренние пробежки, рыбалка.",
+    "Фотография, бег, кулинария, изучение новых языков, путешествия, чтение, прогулки на природе, занятия спортом.",
+]
+
+def random_yellow_family(fam):
+    father = f"{random.choice(MALE_PARENT_NAMES)} {fam}"
+    mother = f"{random.choice(FEMALE_PARENT_NAMES)} {get_female_last_name(fam)}"
+    sibling_type = random.choice(["Брат", "Сестра", None])
+    if sibling_type:
+        sib_name = random.choice(MALE_PARENT_NAMES if sibling_type == "Брат" else FEMALE_PARENT_NAMES)
+        sib_fam = fam if sibling_type == "Брат" else get_female_last_name(fam)
+        sibling = f", {sibling_type.lower()} — {sib_name} {sib_fam}"
+    else:
+        sibling = ""
+    return f"Мама — {mother}, папа — {father}{sibling}"
+
+def yellow_random_birth_and_place(age):
+    dob = random_date_of_birth(age)
+    city = get_random_location()
+    return f"{dob} г., {city}"
+
+def generate_bio_yellow(data: dict) -> str:
+    fio = data.get("fio", "Не указано")
+    fam = fio.split()[-1] if len(fio.split()) > 1 else fio
+    gender = data.get("gender", "Не указано")
+    nationality = data.get("nationality", "Не указано")
+    age = int(data.get("age", 18))
+    birth_and_place = yellow_random_birth_and_place(age)
+    family = random_yellow_family(fam)
+    residence, _ = generate_address()
+    appearance = (
+        f"Глаза {random.choice(EYE_COLORS)}, волосы {random.choice(HAIR_COLORS)}, "
+        f"вес {random.randint(60, 90)} кг, рост {random.randint(165, 195)} см. "
+        f"Одежда: {random.choice(['футболка и джинсы', 'спортивный костюм', 'рубашка и брюки', 'толстовка и джоггеры'])}. "
+        f"Аксессуар: {random.choice(['часы', 'браслет', 'цепочка', 'рюкзак', 'нет'])}."
+    )
+    character = (
+        f"{random.choice(['Спокойный', 'Оптимистичный', 'Решительный', 'Доброжелательный', 'Честный', 'Настойчивый'])}, "
+        f"{random.choice(['целеустремленный', 'отзывчивый', 'аккуратный', 'эмпатичный', 'трудолюбивый'])}, "
+        f"{random.choice(['с поддерживающим характером', 'с чувством юмора', 'умеет слушать', 'иногда бывает замкнутым'])}."
+    )
+    childhood = random.choice(YELLOW_CHILDHOOD)
+    youth_life = random.choice(YELLOW_YOUTH_LIFE)
+    present = random.choice(YELLOW_PRESENT)
+    hobby = random.choice(YELLOW_HOBBY)
+    return (
+        f"<b>Имя Фамилия:</b> {fio}\n"
+        f"<b>Пол:</b> {gender}\n"
+        f"<b>Национальность:</b> {nationality}\n"
+        f"<b>Возраст:</b> {age}\n"
+        f"<b>Дата и место рождения:</b> {birth_and_place}\n"
+        f"<b>Семья:</b> {family}\n"
+        f"<b>Место текущего проживания:</b> {residence}\n"
+        f"<b>Описание внешности:</b> {appearance}\n"
+        f"<b>Особенности характера:</b> {character}\n"
+        f"<b>Детство:</b> {childhood}\n"
+        f"<b>Юность и взрослая жизнь:</b> {youth_life}\n"
+        f"<b>Настоящее время:</b> {present}\n"
+        f"<b>Хобби:</b> {hobby}"
+    )
+
+# === FSM и обработка для всех 4 серверов ===
+
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
@@ -447,6 +534,10 @@ async def choose_server(callback: types.CallbackQuery, state: FSMContext):
     elif callback.data == "server_blue":
         await state.clear()
         await state.set_state(BlueBioStates.waiting_name)
+        await callback.message.answer("<b>1️⃣ Введите имя и фамилию персонажа:</b>\nПример: Иван Иванов", parse_mode="HTML")
+    elif callback.data == "server_yellow":
+        await state.clear()
+        await state.set_state(YellowBioStates.waiting_name)
         await callback.message.answer("<b>1️⃣ Введите имя и фамилию персонажа:</b>\nПример: Иван Иванов", parse_mode="HTML")
     await callback.answer()
 
@@ -623,6 +714,64 @@ async def bluebio_nationality(message: types.Message, state: FSMContext):
     data = await state.get_data()
     bio = generate_bio_blue(data)
     await message.answer("<b>Ваша уникальная RP-биография для сервера BLUE:</b>\n\n" + bio, parse_mode="HTML", reply_markup=main_menu_kb)
+    await state.set_state(MenuStates.waiting_main_menu)
+
+# --- YELLOW ---
+@dp.message(YellowBioStates.waiting_name)
+async def yellowbio_name(message: types.Message, state: FSMContext):
+    fio = message.text.strip()
+    await state.update_data(fio=fio)
+    await state.set_state(YellowBioStates.waiting_gender)
+    kb = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Мужской")],
+            [KeyboardButton(text="Женский")],
+            [KeyboardButton(text="🏠 Главное меню")]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+    await message.answer("<b>2️⃣ Укажите пол персонажа:</b>", reply_markup=kb, parse_mode="HTML")
+
+@dp.message(YellowBioStates.waiting_gender)
+async def yellowbio_gender(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    gender = message.text.strip()
+    if gender.lower() not in ["мужской", "женский"]:
+        await message.answer("Пожалуйста, выберите пол кнопкой ниже.")
+        return
+    await state.update_data(gender=gender.capitalize())
+    await state.set_state(YellowBioStates.waiting_age)
+    await message.answer("<b>3️⃣ Укажите возраст персонажа (от 16 до 65):</b>", reply_markup=types.ReplyKeyboardRemove(), parse_mode="HTML")
+
+@dp.message(YellowBioStates.waiting_age)
+async def yellowbio_age(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    try:
+        age = int(message.text.strip())
+        if age < 16 or age > 65:
+            raise ValueError
+    except ValueError:
+        await message.answer("⚠️ Укажите возраст числом от 16 до 65.")
+        return
+    await state.update_data(age=age)
+    await state.set_state(YellowBioStates.waiting_nationality)
+    await message.answer("<b>4️⃣ Укажите национальность персонажа:</b>", parse_mode="HTML")
+
+@dp.message(YellowBioStates.waiting_nationality)
+async def yellowbio_nationality(message: types.Message, state: FSMContext):
+    if message.text == "🏠 Главное меню":
+        await cmd_start(message, state)
+        return
+    nationality = message.text.strip().capitalize()
+    await state.update_data(nationality=nationality)
+    data = await state.get_data()
+    bio = generate_bio_yellow(data)
+    await message.answer("<b>Ваша уникальная RP-биография для сервера YELLOW:</b>\n\n" + bio, parse_mode="HTML", reply_markup=main_menu_kb)
     await state.set_state(MenuStates.waiting_main_menu)
 
 async def main():
