@@ -1,97 +1,105 @@
 import logging
-from aiogram import Bot, Dispatcher, F
-from aiogram.filters import CommandStart
-from aiogram.types import Message, FSInputFile
-from aiogram.enums.parse_mode import ParseMode
-from aiogram.fsm.storage.memory import MemoryStorage
-import aiohttp
-from bs4 import BeautifulSoup
-import os
-
-API_TOKEN = os.environ.get("API_TOKEN", "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")
+from aiogram import Bot, Dispatcher, executor, types
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from config import TELEGRAM_TOKEN, DEEPSEEK_API_KEY
+import openai
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=API_TOKEN, parse_mode=ParseMode.HTML)
-dp = Dispatcher(storage=MemoryStorage())
+bot = Bot(token="8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")
+dp = Dispatcher(bot)
 
-FORUM_SEARCH_URL = "https://forum.blackrussia.online/index.php?search/&q={query}&type=post"
+openai.api_base = "https://api.deepseek.com/v1"
+openai.api_key = sk-fab5d466db514e5087656e9c49a7a03d
 
-WELCOME_TEXT = (
-    "👋 Привет! Я помогу найти информацию об игроке Black Russia по никнейму.\n"
-    "Просто отправь мне ник, и я покажу, что нашёл на форуме Black Russia."
-)
+# --- Клавиатуры ---
+menu_kb = ReplyKeyboardMarkup(resize_keyboard=True)
+menu_kb.add(KeyboardButton("✍️ Написать РП биографию"))
 
-@dp.message(CommandStart())
-async def cmd_start(message: Message):
-    await message.answer(WELCOME_TEXT)
+# --- Состояния пользователя ---
+from aiogram.dispatcher import FSMContext
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
-@dp.message(F.text.lower() == "получить html")
-async def send_html_file(message: Message):
-    path = "/tmp/forum_response.html"
-    if os.path.exists(path):
-        await message.answer_document(FSInputFile(path), caption="HTML-файл ответа форума")
-    else:
-        await message.answer("Файл forum_response.html не найден.")
+storage = MemoryStorage()
+dp.storage = storage
 
-@dp.message(F.text)
-async def search_player(message: Message):
-    nickname = message.text.strip()
-    if len(nickname) < 3:
-        await message.answer("⚠️ Никнейм должен содержать не менее 3 символов.")
-        return
-    await message.answer(f"🔎 Ищу информацию о <b>{nickname}</b> на форуме Black Russia...")
+class BioStates(StatesGroup):
+    waiting_fio = State()
+    waiting_age = State()
+    waiting_gender = State()
+    waiting_nationality = State()
 
-    info = await search_on_forum(nickname)
-    if info:
-        await message.answer(info, disable_web_page_preview=True)
-    else:
-        await message.answer(
-            f"😔 Не удалось найти информацию о <b>{nickname}</b> на форуме.\n"
-            "Для диагностики отправь команду <b>получить html</b> — и я пришлю файл forum_response.html."
+user_data = {}
+
+# --- Хендлеры ---
+@dp.message_handler(commands=["start"])
+async def cmd_start(message: types.Message):
+    text = (
+        "👋 Привет! Я бот для создания RP-биографий по шаблону.\n"
+        "Нажми кнопку ниже, чтобы начать:"
+    )
+    await message.answer(text, reply_markup=menu_kb)
+
+@dp.message_handler(lambda m: m.text == "✍️ Написать РП биографию")
+async def start_bio(message: types.Message):
+    await BioStates.waiting_fio.set()
+    await message.answer("Введите ФИО персонажа (пример: Иванов Иван Иванович):")
+
+@dp.message_handler(state=BioStates.waiting_fio)
+async def bio_fio(message: types.Message, state: FSMContext):
+    await state.update_data(fio=message.text)
+    await BioStates.waiting_age.set()
+    await message.answer("Введите возраст персонажа (18-65):")
+
+@dp.message_handler(state=BioStates.waiting_age)
+async def bio_age(message: types.Message, state: FSMContext):
+    await state.update_data(age=message.text)
+    await BioStates.waiting_gender.set()
+    await message.answer("Укажите пол персонажа (Мужской/Женский):")
+
+@dp.message_handler(state=BioStates.waiting_gender)
+async def bio_gender(message: types.Message, state: FSMContext):
+    await state.update_data(gender=message.text)
+    await BioStates.waiting_nationality.set()
+    await message.answer("Укажите национальность персонажа:")
+
+@dp.message_handler(state=BioStates.waiting_nationality)
+async def bio_nationality(message: types.Message, state: FSMContext):
+    await state.update_data(nationality=message.text)
+    data = await state.get_data()
+    await state.finish()
+
+    # Генерируем биографию через DeepSeek
+    prompt = (
+        f"Напиши RP-биографию персонажа на форум по шаблону, используя такие данные:\n"
+        f"ФИО: {data['fio']}\n"
+        f"Возраст: {data['age']}\n"
+        f"Пол: {data['gender']}\n"
+        f"Национальность: {data['nationality']}\n"
+        "Остальные пункты (детство, юность, настоящее, характер, семья, хобби, внешность и т.д.) придумай сам, соблюдая правило написания от первого лица, без сверхспособностей, без известных личностей, без ошибок. Минимум 10 строк на раздел детство, юность, настоящее.\n"
+        "Шаблон:\n"
+        "ФИО:\nПол:\nДата рождения:\nВозраст:\nНациональность:\nМесто рождения:\nОбразование:\nОтношение к воинской службе(для мужчин):\nСемья:\nМесто проживания на момент проживания с родителями:\nОписание внешности:\nОсобенности характера:\nВаше фото:\nДетство(От десяти строк):\nЮность(От десяти строк):\nНастоящее время(От десяти строк):\nСемейное положение:\nМесто текущего проживания:.\nИмеется ли судимость?:\nВаше хобби:"
+    )
+    await message.answer("Генерирую биографию, подождите...")
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": "Ты пишешь грамотные RP-биографии на русском языке по форумному шаблону."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1200,
         )
+        bio_text = response.choices[0].message["content"]
+    except Exception as e:
+        await message.answer(f"Ошибка генерации биографии: {e}")
+        return
 
-async def search_on_forum(nickname: str) -> str:
-    url = FORUM_SEARCH_URL.format(query=nickname.replace(" ", "+"))
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-    }
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers) as resp:
-            if resp.status != 200:
-                return None
-            text = await resp.text()
-            # Сохраняем ответ форума в файл для анализа разметки
-            with open("/tmp/forum_response.html", "w", encoding="utf-8") as f:
-                f.write(text)
-            # Обычный парсер дальше
-            soup = BeautifulSoup(text, "lxml")
-            items = soup.select(".structItem--post")
-            if not items:
-                items = soup.select(".structItem")
-            results = []
-            for item in items[:3]:
-                title_a = item.select_one(".structItem-title a")
-                if not title_a:
-                    continue
-                title = title_a.get_text(strip=True)
-                link = title_a["href"]
-                if link.startswith("/"):
-                    link = "https://forum.blackrussia.online" + link
-                snippet = item.select_one(".structItem-snippet")
-                snippet_text = snippet.get_text(strip=True) if snippet else ""
-                user_info = item.select_one(".structItem-minor")
-                user_text = user_info.get_text(strip=True) if user_info else ""
-                result = f"🔗 <a href='{link}'>{title}</a>"
-                if snippet_text:
-                    result += f"\n📝 <i>{snippet_text}</i>"
-                if user_text:
-                    result += f"\n👤 {user_text}"
-                results.append(result)
-            if results:
-                return "<b>Результаты поиска:</b>\n\n" + "\n\n".join(results)
-            return None
+    await message.answer("Вот ваша RP-биография:\n\n" + bio_text)
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(dp.start_polling(bot))
+    from aiogram import executor
+    executor.start_polling(dp, skip_updates=True)
