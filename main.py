@@ -1,7 +1,7 @@
 import logging
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
-from aiogram.types import Message
+from aiogram.types import Message, FSInputFile
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 import aiohttp
@@ -26,6 +26,14 @@ WELCOME_TEXT = (
 async def cmd_start(message: Message):
     await message.answer(WELCOME_TEXT)
 
+@dp.message(F.text.lower() == "получить html")
+async def send_html_file(message: Message):
+    path = "/tmp/forum_response.html"
+    if os.path.exists(path):
+        await message.answer_document(FSInputFile(path), caption="HTML-файл ответа форума")
+    else:
+        await message.answer("Файл forum_response.html не найден.")
+
 @dp.message(F.text)
 async def search_player(message: Message):
     nickname = message.text.strip()
@@ -38,7 +46,10 @@ async def search_player(message: Message):
     if info:
         await message.answer(info, disable_web_page_preview=True)
     else:
-        await message.answer(f"😔 Не удалось найти информацию о <b>{nickname}</b> на форуме. Также сохранён файл ответа форума для анализа.")
+        await message.answer(
+            f"😔 Не удалось найти информацию о <b>{nickname}</b> на форуме.\n"
+            "Для диагностики отправь команду <b>получить html</b> — и я пришлю файл forum_response.html."
+        )
 
 async def search_on_forum(nickname: str) -> str:
     url = FORUM_SEARCH_URL.format(query=nickname.replace(" ", "+"))
@@ -51,9 +62,9 @@ async def search_on_forum(nickname: str) -> str:
                 return None
             text = await resp.text()
             # Сохраняем ответ форума в файл для анализа разметки
-            with open("forum_response.html", "w", encoding="utf-8") as f:
+            with open("/tmp/forum_response.html", "w", encoding="utf-8") as f:
                 f.write(text)
-            # Далее идёт обычный парсер
+            # Обычный парсер дальше
             soup = BeautifulSoup(text, "lxml")
             items = soup.select(".structItem--post")
             if not items:
