@@ -62,7 +62,6 @@ class BlueBioStates(StatesGroup):
     waiting_age = State()
     waiting_nationality = State()
 
-# --- НАБОРЫ ДАННЫХ BLACK RUSSIA ---
 CITIES = [
     "Арзамас", "Нижегородск", "Южный", "Лыткарино"
 ]
@@ -87,11 +86,13 @@ ORGANIZATIONS = [
     "ФСИН", "ФСБ", "Воинская Часть"
 ]
 
-MALE_NAMES = [
-    "Алексей", "Максим", "Виктор", "Сергей", "Игорь", "Владимир", "Евгений", "Дмитрий", "Олег", "Георгий"
+MALE_PARENT_NAMES = [
+    "Иван", "Сергей", "Александр", "Виктор", "Денис", "Максим", "Дмитрий", "Павел", "Андрей", "Владимир",
+    "Егор", "Анатолий", "Олег", "Георгий", "Григорий", "Петр", "Николай", "Константин", "Ярослав", "Артём"
 ]
-FEMALE_NAMES = [
-    "Марина", "Екатерина", "Ирина", "Анна", "Татьяна", "Ольга", "Валентина", "Елена", "Наталья", "Галина"
+FEMALE_PARENT_NAMES = [
+    "Мария", "Екатерина", "Ирина", "Анна", "Татьяна", "Ольга", "Валентина", "Елена", "Наталья", "Галина",
+    "Светлана", "Любовь", "Вера", "Людмила", "Дарья", "Ксения", "Алиса", "Полина", "Василиса", "Яна"
 ]
 
 EYE_COLORS = [
@@ -156,32 +157,33 @@ def generate_address():
         prefix = ""
     return f"{prefix} {city}, ул. {street}, д. {house}, кв. {apt}", city
 
-def get_parent_fio(fam, gender):
-    if gender == "мужской":
-        name = random.choice(MALE_NAMES)
-        return f"{name} {fam}"
+def get_female_last_name(fam):
+    fam = fam.strip()
+    if fam.endswith("ий"):
+        fam_f = fam[:-2] + "ая"
+    elif fam.endswith("ый"):
+        fam_f = fam[:-2] + "ая"
+    elif fam.endswith("ой"):
+        fam_f = fam[:-2] + "ая"
+    elif fam.endswith("ов") or fam.endswith("ев") or fam.endswith("ин"):
+        fam_f = fam + "а"
+    elif fam.endswith("ский"):
+        fam_f = fam[:-4] + "ская"
     else:
-        name = random.choice(FEMALE_NAMES)
         fam_f = fam
-        if fam.endswith("ий"):
-            fam_f = fam[:-2] + "ая"
-        elif fam.endswith("ов") or fam.endswith("ев") or fam.endswith("ин"):
-            fam_f = fam + "а"
-        elif fam.endswith("ый"):
-            fam_f = fam[:-2] + "ая"
-        elif fam.endswith("ский"):
-            fam_f = fam[:-4] + "ская"
-        elif fam.endswith("ой"):
-            fam_f = fam[:-2] + "ая"
-        elif not fam.endswith("а"):
-            fam_f = fam + "а"
-        return f"{name} {fam_f}"
+        if not fam_f.endswith("а"):
+            fam_f += "а"
+    return fam_f
 
 def generate_parents(fam):
-    father = get_parent_fio(fam, "мужской")
-    mother = get_parent_fio(fam, "женский")
+    father_name = random.choice(MALE_PARENT_NAMES)
+    mother_name = random.choice(FEMALE_PARENT_NAMES)
     father_job = random.choice(JOBS + ORGANIZATIONS)
     mother_job = random.choice(JOBS + ORGANIZATIONS)
+    fam = fam.strip()
+    father = f"{father_name} {fam}"
+    mother_fam = get_female_last_name(fam)
+    mother = f"{mother_name} {mother_fam}"
     return {
         "father": f"{father} ({father_job})",
         "mother": f"{mother} ({mother_job})"
@@ -371,11 +373,13 @@ BLUE_HOBBY = [
 
 def generate_bio_blue(data: dict) -> str:
     fio = data.get("fio", "Не указано")
+    fam = fio.split()[-1] if len(fio.split()) > 1 else fio
     gender = data.get("gender", "Не указано")
     age = int(data.get("age", 18))
     dob = random_date_of_birth(age)
     nationality = data.get("nationality", "Не указано")
-    family = data.get("family", "Мама — Ирина Иванова, папа — Иван Иванов")
+    parents = generate_parents(fam)
+    family = f"Мама — {parents['mother'].split(' (')[0]}, папа — {parents['father'].split(' (')[0]}"
     appearance = data.get("appearance", "Высокий, спортивный, открытое лицо, карие глаза, аккуратная причёска.")
     character = data.get("character", "Уверенный, открытый, целеустремлённый, доброжелательный, ответственный.")
     residence = data.get("residence", "г. Арзамас")
@@ -617,7 +621,6 @@ async def bluebio_nationality(message: types.Message, state: FSMContext):
     nationality = message.text.strip().capitalize()
     await state.update_data(nationality=nationality)
     data = await state.get_data()
-    # Дата рождения рассчитывается автоматически по возрасту!
     bio = generate_bio_blue(data)
     await message.answer("<b>Ваша уникальная RP-биография для сервера BLUE:</b>\n\n" + bio, parse_mode="HTML", reply_markup=main_menu_kb)
     await state.set_state(MenuStates.waiting_main_menu)
