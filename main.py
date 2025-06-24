@@ -1,5 +1,5 @@
 import logging
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.enums.parse_mode import ParseMode
@@ -7,7 +7,9 @@ from aiogram.fsm.storage.memory import MemoryStorage
 import aiohttp
 from bs4 import BeautifulSoup
 
-API_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
+import os
+
+API_TOKEN = os.environ.get("API_TOKEN", "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,9 +19,8 @@ dp = Dispatcher(storage=MemoryStorage())
 FORUM_SEARCH_URL = "https://forum.blackrussia.online/index.php?search/&q={query}&type=post"
 
 WELCOME_TEXT = (
-    "👋 Привет! Я — бот для поиска информации об игроках Black Russia по NickName.\n"
-    "Просто отправь мне никнейм, и я найду информацию с форума Black Russia.\n\n"
-    "<i>Пожалуйста, указывай точный NickName для лучшего результата.</i>"
+    "👋 Привет! Я помогу найти информацию об игроке Black Russia по никнейму.\n"
+    "Просто отправь мне ник, и я покажу, что нашёл на форуме Black Russia."
 )
 
 @dp.message(CommandStart())
@@ -42,26 +43,51 @@ async def search_player(message: Message):
 
 async def search_on_forum(nickname: str) -> str:
     url = FORUM_SEARCH_URL.format(query=nickname.replace(" ", "+"))
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+    }
     async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
+        async with session.get(url, headers=headers) as resp:
             if resp.status != 200:
                 return None
             text = await resp.text()
-            soup = BeautifulSoup(text, "html.parser")
-            results = soup.select(".structItem-title a")
-            if not results:
-                return None
-            result = results[0]
-            title = result.get_text(strip=True)
-            href = result["href"]
-            if href.startswith("/"):
-                href = "https://forum.blackrussia.online" + href
-            # Поиск краткой информации в посте (если есть)
-            post_preview = result.find_parent("div", class_="structItem").select_one(".structItem-snippet")
-            post_text = post_preview.get_text(strip=True) if post_preview else "Без превью"
-            return (f"<b>Найдено:</b>\n"
-                    f"🔗 <a href='{href}'>{title}</a>\n"
-                    f"📝 {post_text}")
+            soup = BeautifulSoup(text, "lxml")
+
+            # Поиск блоков с результатами
+            items = soup.select(".structItem--post")
+            if not items:
+                # fallback на старую версию форума/темы
+                items = soup.select(".structItem")
+
+            results = []
+            for item in items[:3]:  # максимум 3 результата
+                title_a = item.select_one(".structItem-title a")
+                if not title_a:
+                    continue
+                title = title_a.get_text(strip=True)
+                link = title_a["href"]
+                if link.startswith("/"):
+                    link = "https://forum.blackrussia.online" + link
+
+                # Отрывок сообщения
+                snippet = item.select_one(".structItem-snippet")
+                snippet_text = snippet.get_text(strip=True) if snippet else ""
+
+                # Краткая информация об авторе/времени, если есть
+                user_info = item.select_one(".structItem-minor")
+                user_text = user_info.get_text(strip=True) if user_info else ""
+
+                # Собираем результат
+                result = f"🔗 <a href='{link}'>{title}</a>"
+                if snippet_text:
+                    result += f"\n📝 <i>{snippet_text}</i>"
+                if user_text:
+                    result += f"\n👤 {user_text}"
+                results.append(result)
+
+            if results:
+                return "<b>Результаты поиска:</b>\n\n" + "\n\n".join(results)
+            return None
 
 if __name__ == "__main__":
     import asyncio
