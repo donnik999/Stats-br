@@ -1,5 +1,6 @@
 import os
 import logging
+import getpass
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
@@ -11,8 +12,14 @@ import openai
 
 logging.basicConfig(level=logging.INFO)
 
-TELEGRAM_TOKEN = os.environ.get("8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")
-DEEPSEEK_API_KEY = os.environ.get("sk-fab5d466db514e5087656e9c49a7a03d")
+# Получаем токены из переменных окружения или через консоль
+TELEGRAM_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
+DEEPSEEK_API_KEY = "sk-fab5d466db514e5087656e9c49a7a03d"
+
+if not TELEGRAM_TOKEN:
+    TELEGRAM_TOKEN = getpass.getpass("Введите TELEGRAM_TOKEN: ")
+if not DEEPSEEK_API_KEY:
+    DEEPSEEK_API_KEY = getpass.getpass("Введите DEEPSEEK_API_KEY (DeepSeek): ")
 
 bot = Bot(token=TELEGRAM_TOKEN)
 storage = MemoryStorage()
@@ -102,4 +109,7 @@ async def main():
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
+    import sys
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())
