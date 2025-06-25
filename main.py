@@ -173,10 +173,12 @@ def main_menu():
     )
 
 def servers_menu():
-    kb = InlineKeyboardMarkup(row_width=2)
-    for srv in ['Red', 'Green', 'Blue', 'Yellow', 'Orange', 'Purple', 'Lime', 'Pink', 'Cherry', 'Black']:
-        kb.add(InlineKeyboardButton(text=srv, callback_data=f"server_{srv}"))
-    return kb
+    # Для InlineKeyboardMarkup в aiogram 3.x используем список списков кнопок!
+    buttons = [
+        [InlineKeyboardButton(text=srv, callback_data=f"server_{srv}")]
+        for srv in ['Red', 'Green', 'Blue', 'Yellow', 'Orange', 'Purple', 'Lime', 'Pink', 'Cherry', 'Black']
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 # --- СТАРТ И КРАТКОЕ ОПИСАНИЕ ---
 @router.message(Command("start"))
@@ -204,17 +206,6 @@ async def write_bio(message: Message):
         "🌐 <b>Выбери сервер для своей биографии:</b>",
         reply_markup=servers_menu()
     )
-
-@router.message(F.text == "📬 Связь с автором")
-async def contact_author(message: Message):
-    text = (
-        "💬 <b>Обратная связь с автором</b>\n\n"
-        "Есть вопросы, идеи или предложения? Пиши в Telegram: "
-        "<a href='https://t.me/bunkoc'>@bunkoc</a>\n\n"
-        "🌟 Автор всегда рад новым знакомствам и идеям! "
-        "Возможно, именно твоя мысль сделает бота ещё круче 🚀"
-    )
-    await message.answer(text, disable_web_page_preview=True)
 
 @router.callback_query(F.data.startswith("server_"))
 async def handle_server_choice(call: CallbackQuery):
@@ -260,6 +251,17 @@ async def generate_full_bio(message: Message):
     await message.answer(text, reply_markup=main_menu())
     if data["server"] in PHOTO_SERVERS:
         await message.answer("📸 <b>Пожалуйста, прикрепите своё фото для этого пункта биографии.</b>")
+
+@router.message(F.text == "📬 Связь с автором")
+async def contact_author(message: Message):
+    text = (
+        "💬 <b>Обратная связь с автором</b>\n\n"
+        "Есть вопросы, идеи или предложения? Пиши в Telegram: "
+        "<a href='https://t.me/bunkoc'>@bunkoc</a>\n\n"
+        "🌟 Автор всегда рад новым знакомствам и идеям! "
+        "Возможно, именно твоя мысль сделает бота ещё круче 🚀"
+    )
+    await message.answer(text, disable_web_page_preview=True)
 
 def generate_bio(data):
     name = data["name"]
