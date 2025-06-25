@@ -9,8 +9,9 @@ from aiogram.types import (
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
-API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'
+API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'  # <-- ВСТАВЬ СЮДА СВОЙ ТОКЕН
 
+# ==== ДАННЫЕ ДЛЯ ГЕНЕРАЦИИ ====
 JOBS = [
     "Таксист", "Рыболов", "Механик", "Работник на ферме", "Работник на Заводе", "Водолаз",
     "Электрик", "Газовщик", "Крупье", "Инкассатор", "Водитель автобуса", "Кладоискатель",
@@ -156,6 +157,11 @@ dp = Dispatcher()
 router = Router()
 user_states = {}
 
+def start_menu():
+    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb.add(KeyboardButton("Старт"))
+    return kb
+
 def main_menu():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
     kb.add(KeyboardButton("📝 Написать РП биографию"))
@@ -168,15 +174,23 @@ def servers_menu():
         kb.add(InlineKeyboardButton(text=srv, callback_data=f"server_{srv}"))
     return kb
 
-@router.message(Command("start", "menu"))
+@router.message(Command("start"))
 async def cmd_start(message: Message):
     user_states.pop(message.from_user.id, None)
     text = (
         "👋 <b>Добро пожаловать в RP Bio Бот!</b>\n\n"
         "📖 Здесь ты можешь создать уникальную RP-биографию для любого сервера.\n\n"
-        "Выбери действие ниже:"
+        "Нажми <b>Старт</b> для продолжения."
     )
-    await message.answer(text, reply_markup=main_menu())
+    await message.answer(text, reply_markup=start_menu())
+
+@router.message(F.text.lower() == "старт")
+async def go_to_main(message: Message):
+    user_states.pop(message.from_user.id, None)
+    await message.answer(
+        "Выбери действие ниже:",
+        reply_markup=main_menu()
+    )
 
 @router.message(F.text == "📝 Написать РП биографию")
 async def write_bio(message: Message):
@@ -282,7 +296,17 @@ def generate_bio(data):
 
 @router.message()
 async def fallback(message: Message):
-    await message.answer("Пожалуйста, выбери действие из меню ⬇️", reply_markup=main_menu())
+    # Если нет истории или пользователь не выбрал действие — показываем старт-меню
+    if not user_states.get(message.from_user.id):
+        await message.answer(
+            "Для начала работы нажми кнопку <b>Старт</b> 👇",
+            reply_markup=start_menu()
+        )
+    else:
+        await message.answer(
+            "Пожалуйста, выбери действие из меню ⬇️",
+            reply_markup=main_menu()
+        )
 
 async def main():
     dp.include_router(router)
