@@ -1,11 +1,12 @@
-import telebot
-from telebot import types
+import asyncio
 import random
+from aiogram import Bot, Dispatcher, types
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils import executor
 
-TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'
-bot = telebot.TeleBot(TOKEN)
+API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'
 
-# --- СПИСКИ ДЛЯ ГЕНЕРАЦИИ ---
+# --- ДАННЫЕ ДЛЯ ГЕНЕРАЦИИ ---
 JOBS = [
     "Таксист", "Рыболов", "Механик", "Работник на ферме", "Работник на Заводе", "Водолаз",
     "Электрик", "Газовщик", "Крупье", "Инкассатор", "Водитель автобуса", "Кладоискатель",
@@ -122,7 +123,6 @@ BIO_TEMPLATES = {
         "Юность: {youth}\n"
         "Взрослая жизнь: {adultlife}\n"
     ),
-    # Все остальные — как Red (можно добавить свои шаблоны по аналогии)
 }
 
 DEFAULT_TEMPLATE = (
@@ -143,45 +143,46 @@ DEFAULT_TEMPLATE = (
     "<b>Взрослая жизнь:</b> {adultlife}\n"
 )
 
-# --- СОСТОЯНИЕ ДЛЯ ДИАЛОГА ---
+PHOTO_SERVERS = ["Orange", "Blue"]
+
+# --- AIROGRAM SETUP ---
+bot = Bot(token=API_TOKEN, parse_mode="HTML")
+dp = Dispatcher(bot)
+
 user_states = {}
 
 def main_menu():
-    kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    btn1 = types.KeyboardButton("📝 Написать РП биографию")
-    btn2 = types.KeyboardButton("📬 Связь с автором")
-    kb.add(btn1)
-    kb.add(btn2)
+    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb.add(KeyboardButton("📝 Написать РП биографию"))
+    kb.add(KeyboardButton("📬 Связь с автором"))
     return kb
 
 def servers_menu():
-    kb = types.InlineKeyboardMarkup(row_width=2)
+    kb = InlineKeyboardMarkup(row_width=2)
     for srv in ['Red', 'Green', 'Blue', 'Yellow', 'Orange', 'Purple', 'Lime', 'Pink', 'Cherry', 'Black']:
-        kb.add(types.InlineKeyboardButton(text=srv, callback_data=f"server_{srv}"))
+        kb.add(InlineKeyboardButton(text=srv, callback_data=f"server_{srv}"))
     return kb
 
-@bot.message_handler(commands=['start', 'menu'])
-def start_message(message):
-    user_states.pop(message.chat.id, None)
+@dp.message_handler(commands=['start', 'menu'])
+async def cmd_start(message: types.Message):
+    user_states.pop(message.from_user.id, None)
     text = (
         "👋 <b>Добро пожаловать в RP Bio Бот!</b>\n\n"
         "📖 Здесь ты можешь создать уникальную RP-биографию для любого сервера.\n\n"
         "Выбери действие ниже:"
     )
-    bot.send_message(message.chat.id, text, parse_mode='HTML', reply_markup=main_menu())
+    await message.answer(text, reply_markup=main_menu())
 
-@bot.message_handler(func=lambda m: m.text == "📝 Написать РП биографию")
-def write_bio(message):
-    user_states[message.chat.id] = {"step": "choose_server"}
-    bot.send_message(
-        message.chat.id,
+@dp.message_handler(lambda m: m.text == "📝 Написать РП биографию")
+async def write_bio(message: types.Message):
+    user_states[message.from_user.id] = {"step": "choose_server"}
+    await message.answer(
         "🌐 <b>Выбери сервер для своей биографии:</b>",
-        parse_mode='HTML',
         reply_markup=servers_menu()
     )
 
-@bot.message_handler(func=lambda m: m.text == "📬 Связь с автором")
-def contact_author(message):
+@dp.message_handler(lambda m: m.text == "📬 Связь с автором")
+async def contact_author(message: types.Message):
     text = (
         "💬 <b>Обратная связь с автором</b>\n\n"
         "Есть вопросы, идеи или предложения? Пиши в Telegram: "
@@ -189,49 +190,49 @@ def contact_author(message):
         "🌟 Автор всегда рад новым знакомствам и идеям! "
         "Возможно, именно твоя мысль сделает бота ещё круче 🚀"
     )
-    bot.send_message(message.chat.id, text, parse_mode='HTML', disable_web_page_preview=True)
+    await message.answer(text, disable_web_page_preview=True)
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith("server_"))
-def handle_server_choice(call):
+@dp.callback_query_handler(lambda call: call.data.startswith("server_"))
+async def handle_server_choice(call: types.CallbackQuery):
     server = call.data.replace("server_", "")
-    user_states[call.message.chat.id] = {"step": "ask_name", "server": server}
-    bot.send_message(call.message.chat.id, "Введите <b>Имя</b> персонажа:", parse_mode='HTML')
+    user_states[call.from_user.id] = {"step": "ask_name", "server": server}
+    await call.message.answer("Введите <b>Имя</b> персонажа:")
+    await call.answer()
 
-@bot.message_handler(func=lambda m: user_states.get(m.chat.id, {}).get("step") == "ask_name")
-def ask_surname(message):
-    user_states[message.chat.id]["name"] = message.text.strip()
-    user_states[message.chat.id]["step"] = "ask_surname"
-    bot.send_message(message.chat.id, "Введите <b>Фамилию</b> персонажа:", parse_mode='HTML')
+@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_name")
+async def ask_surname(message: types.Message):
+    user_states[message.from_user.id]["name"] = message.text.strip()
+    user_states[message.from_user.id]["step"] = "ask_surname"
+    await message.answer("Введите <b>Фамилию</b> персонажа:")
 
-@bot.message_handler(func=lambda m: user_states.get(m.chat.id, {}).get("step") == "ask_surname")
-def ask_age(message):
-    user_states[message.chat.id]["surname"] = message.text.strip()
-    user_states[message.chat.id]["step"] = "ask_age"
-    bot.send_message(message.chat.id, "Введите <b>Возраст</b> персонажа:", parse_mode='HTML')
+@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_surname")
+async def ask_age(message: types.Message):
+    user_states[message.from_user.id]["surname"] = message.text.strip()
+    user_states[message.from_user.id]["step"] = "ask_age"
+    await message.answer("Введите <b>Возраст</b> персонажа:")
 
-@bot.message_handler(func=lambda m: user_states.get(m.chat.id, {}).get("step") == "ask_age")
-def ask_gender(message):
-    user_states[message.chat.id]["age"] = message.text.strip()
-    user_states[message.chat.id]["step"] = "ask_gender"
-    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_age")
+async def ask_gender(message: types.Message):
+    user_states[message.from_user.id]["age"] = message.text.strip()
+    user_states[message.from_user.id]["step"] = "ask_gender"
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     kb.add("Мужской", "Женский")
-    bot.send_message(message.chat.id, "Выберите <b>Пол</b> персонажа:", parse_mode='HTML', reply_markup=kb)
+    await message.answer("Выберите <b>Пол</b> персонажа:", reply_markup=kb)
 
-@bot.message_handler(func=lambda m: user_states.get(m.chat.id, {}).get("step") == "ask_gender")
-def ask_nationality(message):
-    user_states[message.chat.id]["gender"] = message.text.strip()
-    user_states[message.chat.id]["step"] = "ask_nationality"
-    bot.send_message(message.chat.id, "Введите <b>Национальность</b> персонажа:", parse_mode='HTML', reply_markup=types.ReplyKeyboardRemove())
+@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_gender")
+async def ask_nationality(message: types.Message):
+    user_states[message.from_user.id]["gender"] = message.text.strip()
+    user_states[message.from_user.id]["step"] = "ask_nationality"
+    await message.answer("Введите <b>Национальность</b> персонажа:", reply_markup=ReplyKeyboardRemove())
 
-@bot.message_handler(func=lambda m: user_states.get(m.chat.id, {}).get("step") == "ask_nationality")
-def generate_full_bio(message):
-    user_states[message.chat.id]["nationality"] = message.text.strip()
-    data = user_states.pop(message.chat.id)
+@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_nationality")
+async def generate_full_bio(message: types.Message):
+    user_states[message.from_user.id]["nationality"] = message.text.strip()
+    data = user_states.pop(message.from_user.id)
     text = generate_bio(data)
-    bot.send_message(message.chat.id, text, parse_mode='HTML', reply_markup=main_menu())
-    # Если шаблон содержит фото — отдельное сообщение
-    if data["server"] in ["Orange", "Blue"]:  # или добавить любые, где нужно фото
-        bot.send_message(message.chat.id, "📸 <b>Пожалуйста, прикрепите своё фото для этого пункта биографии.</b>", parse_mode='HTML')
+    await message.answer(text, reply_markup=main_menu())
+    if data["server"] in PHOTO_SERVERS:
+        await message.answer("📸 <b>Пожалуйста, прикрепите своё фото для этого пункта биографии.</b>")
 
 def generate_bio(data):
     name = data["name"]
@@ -276,14 +277,9 @@ def generate_bio(data):
     )
     return f"📄 <b>RP-биография для сервера {server}:</b>\n\n{bio}"
 
-@bot.message_handler(content_types=['text'])
-def fallback(message):
-    bot.send_message(
-        message.chat.id,
-        "Пожалуйста, выбери действие из меню ⬇️",
-        reply_markup=main_menu()
-    )
+@dp.message_handler()
+async def fallback(message: types.Message):
+    await message.answer("Пожалуйста, выбери действие из меню ⬇️", reply_markup=main_menu())
 
 if __name__ == '__main__':
-    print("Бот запущен!")
-    bot.infinity_polling()
+    executor.start_polling(dp, skip_updates=True)
