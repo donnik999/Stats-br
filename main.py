@@ -1,13 +1,15 @@
 import asyncio
 import random
-from aiogram import Bot, Dispatcher, types, F, Router
+from aiogram import Bot, Dispatcher, F, Router
 from aiogram.filters import Command
 from aiogram.types import (
     Message, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove,
     InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 )
+from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
 
-API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'
+TELEGRAM_TOKEN = ("8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")
 
 JOBS = [
     "Таксист", "Рыболов", "Механик", "Работник на ферме", "Работник на Заводе", "Водолаз",
@@ -146,7 +148,10 @@ DEFAULT_TEMPLATE = (
 
 PHOTO_SERVERS = ["Orange", "Blue"]
 
-bot = Bot(token=API_TOKEN, parse_mode="HTML")
+bot = Bot(
+    token=API_TOKEN,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
 dp = Dispatcher()
 router = Router()
 user_states = {}
