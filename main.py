@@ -1,12 +1,14 @@
 import asyncio
 import random
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils import executor
+from aiogram import Bot, Dispatcher, types, F, Router
+from aiogram.filters import Command
+from aiogram.types import (
+    Message, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove,
+    InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+)
 
 API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'
 
-# --- ДАННЫЕ ДЛЯ ГЕНЕРАЦИИ ---
 JOBS = [
     "Таксист", "Рыболов", "Механик", "Работник на ферме", "Работник на Заводе", "Водолаз",
     "Электрик", "Газовщик", "Крупье", "Инкассатор", "Водитель автобуса", "Кладоискатель",
@@ -70,7 +72,6 @@ APPEARANCE_SAMPLES = [
     "Ничем не примечательная внешность, что только помогает оставаться незаметным."
 ]
 
-# --- ШАБЛОНЫ ДЛЯ СЕРВЕРОВ ---
 BIO_TEMPLATES = {
     "Red": (
         "<b>Имя и Фамилия:</b> {name} {surname}\n"
@@ -145,10 +146,9 @@ DEFAULT_TEMPLATE = (
 
 PHOTO_SERVERS = ["Orange", "Blue"]
 
-# --- AIROGRAM SETUP ---
 bot = Bot(token=API_TOKEN, parse_mode="HTML")
-dp = Dispatcher(bot)
-
+dp = Dispatcher()
+router = Router()
 user_states = {}
 
 def main_menu():
@@ -163,8 +163,8 @@ def servers_menu():
         kb.add(InlineKeyboardButton(text=srv, callback_data=f"server_{srv}"))
     return kb
 
-@dp.message_handler(commands=['start', 'menu'])
-async def cmd_start(message: types.Message):
+@router.message(Command("start", "menu"))
+async def cmd_start(message: Message):
     user_states.pop(message.from_user.id, None)
     text = (
         "👋 <b>Добро пожаловать в RP Bio Бот!</b>\n\n"
@@ -173,16 +173,16 @@ async def cmd_start(message: types.Message):
     )
     await message.answer(text, reply_markup=main_menu())
 
-@dp.message_handler(lambda m: m.text == "📝 Написать РП биографию")
-async def write_bio(message: types.Message):
+@router.message(F.text == "📝 Написать РП биографию")
+async def write_bio(message: Message):
     user_states[message.from_user.id] = {"step": "choose_server"}
     await message.answer(
         "🌐 <b>Выбери сервер для своей биографии:</b>",
         reply_markup=servers_menu()
     )
 
-@dp.message_handler(lambda m: m.text == "📬 Связь с автором")
-async def contact_author(message: types.Message):
+@router.message(F.text == "📬 Связь с автором")
+async def contact_author(message: Message):
     text = (
         "💬 <b>Обратная связь с автором</b>\n\n"
         "Есть вопросы, идеи или предложения? Пиши в Telegram: "
@@ -192,41 +192,41 @@ async def contact_author(message: types.Message):
     )
     await message.answer(text, disable_web_page_preview=True)
 
-@dp.callback_query_handler(lambda call: call.data.startswith("server_"))
-async def handle_server_choice(call: types.CallbackQuery):
+@router.callback_query(F.data.startswith("server_"))
+async def handle_server_choice(call: CallbackQuery):
     server = call.data.replace("server_", "")
     user_states[call.from_user.id] = {"step": "ask_name", "server": server}
     await call.message.answer("Введите <b>Имя</b> персонажа:")
     await call.answer()
 
-@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_name")
-async def ask_surname(message: types.Message):
+@router.message(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_name")
+async def ask_surname(message: Message):
     user_states[message.from_user.id]["name"] = message.text.strip()
     user_states[message.from_user.id]["step"] = "ask_surname"
     await message.answer("Введите <b>Фамилию</b> персонажа:")
 
-@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_surname")
-async def ask_age(message: types.Message):
+@router.message(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_surname")
+async def ask_age(message: Message):
     user_states[message.from_user.id]["surname"] = message.text.strip()
     user_states[message.from_user.id]["step"] = "ask_age"
     await message.answer("Введите <b>Возраст</b> персонажа:")
 
-@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_age")
-async def ask_gender(message: types.Message):
+@router.message(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_age")
+async def ask_gender(message: Message):
     user_states[message.from_user.id]["age"] = message.text.strip()
     user_states[message.from_user.id]["step"] = "ask_gender"
     kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     kb.add("Мужской", "Женский")
     await message.answer("Выберите <b>Пол</b> персонажа:", reply_markup=kb)
 
-@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_gender")
-async def ask_nationality(message: types.Message):
+@router.message(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_gender")
+async def ask_nationality(message: Message):
     user_states[message.from_user.id]["gender"] = message.text.strip()
     user_states[message.from_user.id]["step"] = "ask_nationality"
     await message.answer("Введите <b>Национальность</b> персонажа:", reply_markup=ReplyKeyboardRemove())
 
-@dp.message_handler(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_nationality")
-async def generate_full_bio(message: types.Message):
+@router.message(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_nationality")
+async def generate_full_bio(message: Message):
     user_states[message.from_user.id]["nationality"] = message.text.strip()
     data = user_states.pop(message.from_user.id)
     text = generate_bio(data)
@@ -241,7 +241,6 @@ def generate_bio(data):
     gender = data["gender"]
     nationality = data["nationality"]
     server = data["server"]
-
     family = random.choice(FAMILY_SAMPLES)
     place_birth = random.choice(PLACES)
     place_live = random.choice(PLACES)
@@ -254,7 +253,6 @@ def generate_bio(data):
     childhood = random.choice(CHILDHOOD_SAMPLES)
     youth = random.choice(YOUTH_SAMPLES)
     adultlife = random.choice(ADULT_LIFE_SAMPLES)
-
     template = BIO_TEMPLATES.get(server, DEFAULT_TEMPLATE)
     bio = template.format(
         name=name,
@@ -277,9 +275,13 @@ def generate_bio(data):
     )
     return f"📄 <b>RP-биография для сервера {server}:</b>\n\n{bio}"
 
-@dp.message_handler()
-async def fallback(message: types.Message):
+@router.message()
+async def fallback(message: Message):
     await message.answer("Пожалуйста, выбери действие из меню ⬇️", reply_markup=main_menu())
 
+async def main():
+    dp.include_router(router)
+    await dp.start_polling(bot)
+
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(main())
