@@ -9,7 +9,7 @@ from aiogram.types import (
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
-API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'  # <-- ВСТАВЬ СЮДА СВОЙ ТОКЕН
+API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'  # <-- ВСТАВЬ СЮДА ТОКЕН
 
 # ==== ДАННЫЕ ДЛЯ ГЕНЕРАЦИИ ====
 JOBS = [
@@ -125,7 +125,7 @@ BIO_TEMPLATES = {
         "Хобби: {hobby}\n"
         "Детство: {childhood}\n"
         "Юность: {youth}\n"
-        "Взрослая жизнь: {adultlife}\n"
+        "Взрослая жизнь:</b> {adultlife}\n"
     ),
 }
 
@@ -158,15 +158,19 @@ router = Router()
 user_states = {}
 
 def start_menu():
-    kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    kb.add(KeyboardButton("Старт"))
-    return kb
+    return ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Старт")]],
+        resize_keyboard=True
+    )
 
 def main_menu():
-    kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    kb.add(KeyboardButton("📝 Написать РП биографию"))
-    kb.add(KeyboardButton("📬 Связь с автором"))
-    return kb
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="📝 Написать РП биографию")],
+            [KeyboardButton(text="📬 Связь с автором")]
+        ],
+        resize_keyboard=True
+    )
 
 def servers_menu():
     kb = InlineKeyboardMarkup(row_width=2)
@@ -174,13 +178,14 @@ def servers_menu():
         kb.add(InlineKeyboardButton(text=srv, callback_data=f"server_{srv}"))
     return kb
 
+# --- СТАРТ И КРАТКОЕ ОПИСАНИЕ ---
 @router.message(Command("start"))
 async def cmd_start(message: Message):
     user_states.pop(message.from_user.id, None)
     text = (
         "👋 <b>Добро пожаловать в RP Bio Бот!</b>\n\n"
-        "📖 Здесь ты можешь создать уникальную RP-биографию для любого сервера.\n\n"
-        "Нажми <b>Старт</b> для продолжения."
+        "Этот бот поможет тебе быстро и красиво сгенерировать РП-биографию персонажа для любого сервера!\n\n"
+        "📖 Просто нажми <b>Старт</b> и следуй инструкциям!"
     )
     await message.answer(text, reply_markup=start_menu())
 
@@ -234,8 +239,11 @@ async def ask_age(message: Message):
 async def ask_gender(message: Message):
     user_states[message.from_user.id]["age"] = message.text.strip()
     user_states[message.from_user.id]["step"] = "ask_gender"
-    kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    kb.add("Мужской", "Женский")
+    kb = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Мужской")], [KeyboardButton(text="Женский")]],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
     await message.answer("Выберите <b>Пол</b> персонажа:", reply_markup=kb)
 
 @router.message(lambda m: user_states.get(m.from_user.id, {}).get("step") == "ask_gender")
@@ -296,7 +304,6 @@ def generate_bio(data):
 
 @router.message()
 async def fallback(message: Message):
-    # Если нет истории или пользователь не выбрал действие — показываем старт-меню
     if not user_states.get(message.from_user.id):
         await message.answer(
             "Для начала работы нажми кнопку <b>Старт</b> 👇",
