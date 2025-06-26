@@ -1945,8 +1945,10 @@ def gen_field(field, data):
         return random.choice(["Инженер", "Врач", "Учитель", "Менеджер"])
     if field == "criminal":
         return random.choice(["Нет", "Да, условно", "Есть, снята/погашена"])
-    if field == "qualities":
+    if field == "qualities"
         return generate_qualities()
+    if field == "growing_up":
+        return "\n".join(random.sample(ADULTHOOD, 3))
     if field == "birthplace_residence":
         return f"{random.choice(BIRTHPLACES)} / {random.choice(RESIDENCES)}"
     return "—"
