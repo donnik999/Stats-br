@@ -1913,7 +1913,9 @@ def gen_field(field, data):
     if field == "maturity":
         return "\n".join(random.sample(MATURITY, 3))
     if field == "youth_adult":
-        return f"{random.choice(CHILDHOOD)} {random.choice(ADULTHOOD)}"
+        youth = random.choice(YOUTH_TEMPLATES)
+        adulthood = random.choice(ADULTHOOD_TEMPLATES)
+        return f"{youth}\n\n{adulthood}"
     if field == "children":
         return "Не имеет"
     if field == "bad_habits":
