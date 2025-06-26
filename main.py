@@ -1935,7 +1935,6 @@ async def write_bio(message: Message):
 @router.callback_query(F.data.startswith("server_"))
 async def handle_server_choice(call: CallbackQuery):
     server = call.data.replace("server_", "")
-    # Выбираем список полей в зависимости от сервера
     user_fields = ["fio", "age", "gender", "nationality"] if server in FIO_SERVERS else DEFAULT_USER_FIELDS
     user_states[call.from_user.id] = {
         "step": "collect_user_fields",
@@ -1944,6 +1943,8 @@ async def handle_server_choice(call: CallbackQuery):
         "user_field_idx": 0,
         "user_fields": user_fields,
     }
+    await ask_user_field(call.message, call.from_user.id)  # <-- ВЫЗОВИ ЭТУ СТРОКУ!
+    await call.answer()
 async def ask_user_field(message, user_id):
     state = user_states[user_id]
     idx = state["user_field_idx"]
