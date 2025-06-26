@@ -1894,7 +1894,12 @@ def gen_field(field, data):
     if field == "bad_habits":
         return random.choice(["Не курит", "Курит редко", "Не имеет"])
     if field == "parents":
-        return "Отец — Иван, мать — Мария"
+        surname = data.get("surname")
+    if not surname and data.get("fio"):
+        surname = data["fio"].split()[0]
+    if not surname:
+        surname = "Иванов"
+    return generate_parents(surname)
     if field == "maturity":
         return random.choice(["Работает", "На пенсии", "Ведет бизнес"])
     if field == "marital":
@@ -1955,11 +1960,11 @@ def generate_birthdate_by_age(age: int) -> str:
     return f"{day:02d}.{month:02d}.{birth_year}"
 
 def generate_adulthood():
-    selected = random.sample(ADULTHOOD, k=5)
+    selected = random.sample(ADULTHOOD, k=10)
     return " ".join(selected)
 
 def generate_now():
-    selected = random.sample(NOW, k=5) 
+    selected = random.sample(NOW, k=10) 
     return " ".join(selected)
     
 def generate_childhood_and_youth(city="Батырево"):
@@ -1970,7 +1975,6 @@ def generate_childhood_and_youth(city="Батырево"):
 def generate_parents(surname):
     male_name = random.choice(MALE_NAMES)
     female_name = random.choice(FEMALE_NAMES)
-    # Для простоты склонение не делаем, просто добавляем "а" для женской фамилии (не всегда корректно)
     female_surname = surname
     if not surname.endswith('а'):
         female_surname = surname + 'а'
