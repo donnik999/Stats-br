@@ -1895,11 +1895,11 @@ def gen_field(field, data):
         return random.choice(["Не курит", "Курит редко", "Не имеет"])
     if field == "parents":
         surname = data.get("surname")
-    if not surname and data.get("fio"):
-        surname = data["fio"].split()[0]
-    if not surname:
-        surname = "Иванов"
-    return generate_parents(surname)
+        if not surname and data.get("fio"):
+            surname = data["fio"].split()[0]
+        if not surname:
+            surname = "Иванов"
+        return generate_parents(surname)
     if field == "maturity":
         return random.choice(["Работает", "На пенсии", "Ведет бизнес"])
     if field == "marital":
