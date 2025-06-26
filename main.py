@@ -18,6 +18,9 @@ API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'  # <-- Вставь
 FIO_SERVERS = {"AZURE", "PLATINUM", "CHILLI", "PERM", "MURMANSK", "PENZA"}
 DEFAULT_USER_FIELDS = ["name", "surname", "age", "gender", "nationality"]
 
+MALE_NAMES = ["Александр", "Сергей", "Владимир", "Игорь", "Дмитрий", "Андрей"]
+FEMALE_NAMES = ["Мария", "Екатерина", "Ольга", "Анна", "Татьяна", "Наталья"]
+
 # ---------------------- Примеры для генерации -------------------------
 BIRTHPLACES = ["Арзамас", "Батырево", "Южный", "Егоровка", "Корякино", "Рублевка", "Бусаево", "Нижегородск"]
 RESIDENCES = ["Арзамас", "Рублевка", "Бусаево", "Южный", "Егоровка", "Нижегородск", "Батырево"]
@@ -370,10 +373,9 @@ ALL_SERVERS = [
 # ---------------------- Шаблоны для серверов --------------------------
 BIO_TEMPLATES = {
     "RED": '''Основная информация:
-Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+Имя, фамилия: {fio}
 Пол: {gender}
+Дата рождения {dob}
 Национальность: {nationality}
 Место рождения: {birthplace}
 Место проживания: {residence}
@@ -382,26 +384,34 @@ BIO_TEMPLATES = {
 Хобби: {hobby}
 
 Биография гражданина:
-Детство и юность: {childhood}
+Детство и юность: {childhood_and_youth}
 Взрослая жизнь: {adulthood}
 Настоящее время: {now}
 ''',
     "GREEN": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
 Место рождения: {birthplace}
 Место проживания: {residence}
-Описание внешности: {appearance}
-Черты характера: {traits}
-Хобби: {hobby}
+Семейное положение: {marital}
+Дети: {children}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
+Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
+Личное фото: {photo}
 Детство: {childhood}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
+Юность: {youth}
+Взросление: {growing_up}
+Зрелость: {maturity}
+Наши дни: {now}
 ''',
-    "BLUE": '''Имя: {name}
-Фамилия: {surname}
+    "BLUE": '''Имя, фамилия: {fio}
 Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
@@ -415,8 +425,7 @@ BIO_TEMPLATES = {
 Взрослая жизнь: {adulthood}
 Хобби: {hobby}
 ''',
-    "YELLOW": '''Имя: {name}
-Фамилия: {surname}
+    "YELLOW": '''Имя, фамилия: {fio}
 Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
@@ -430,8 +439,7 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "ORANGE": '''Имя: {name}
-Фамилия: {surname}
+    "ORANGE": '''Имя, фамилия: {fio}
 Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
@@ -457,8 +465,7 @@ BIO_TEMPLATES = {
 Взрослая жизнь: {adulthood}
 Настоящее время: {now}
 ''',
-    "LIME": '''Имя: {name}
-Фамилия: {surname}
+    "LIME": '''Имя, фамилия: {fio}
 Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
@@ -472,8 +479,7 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "PINK": '''Имя: {name}
-Фамилия: {surname}
+    "PINK": '''Имя, фамилия: {fio}
 Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
@@ -592,11 +598,9 @@ BIO_TEMPLATES = {
 Хобби: {hobby}
 ''',
     "AZURE": '''ФИО: {fio}
-Возраст: {age}
-Пол: {gender}
-Национальность: {nationality}
 Дата и место рождения: {dob_place}
 Семья: {family}
+Образование: {education}
 Место проживания: {residence}
 Внешность: {appearance}
 Особенности характера: {traits}
@@ -1573,6 +1577,7 @@ BIO_TEMPLATES = {
 Пол: {gender}
 Национальность: {nationality}
 Дата и место рождения: {dob_place}
+Образование: {education}
 Семья: {family}
 Место проживания: {residence}
 Внешность: {appearance}
@@ -1881,6 +1886,15 @@ def generate_birthdate_by_age(age: int) -> str:
     else:
         day = random.randint(1, 31)
     return f"{day:02d}.{month:02d}.{birth_year}"
+
+def generate_parents(surname):
+    male_name = random.choice(MALE_NAMES)
+    female_name = random.choice(FEMALE_NAMES)
+    # Для простоты склонение не делаем, просто добавляем "а" для женской фамилии (не всегда корректно)
+    female_surname = surname
+    if not surname.endswith('а'):
+        female_surname = surname + 'а'
+    return f"Отец: {male_name} {surname}\nМать: {female_name} {female_surname}"
     
 def start_menu():
     return ReplyKeyboardMarkup(
