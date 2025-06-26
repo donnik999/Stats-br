@@ -1943,7 +1943,7 @@ async def handle_server_choice(call: CallbackQuery):
         "data": {},
         "user_field_idx": 0,
         "user_fields": user_fields,
-
+    }
 async def ask_user_field(message, user_id):
     state = user_states[user_id]
     idx = state["user_field_idx"]
