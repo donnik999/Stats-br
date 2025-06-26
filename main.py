@@ -1883,6 +1883,8 @@ def gen_field(field, data):
         return random.choice(BIRTHPLACES)
     if field == "residence":
         return random.choice(RESIDENCES)
+    if field == "birthplace":
+        return random.choice(BIRTHPLACES)
     if field == "appearance":
         return random.choice(APPEARANCES)
     if field == "childhood_and_youth":
@@ -1945,7 +1947,7 @@ def gen_field(field, data):
         return random.choice(["Инженер", "Врач", "Учитель", "Менеджер"])
     if field == "criminal":
         return random.choice(["Нет", "Да, условно", "Есть, снята/погашена"])
-    if field == "qualities"
+    if field == "qualities":
         return generate_qualities()
     if field == "growing_up":
         return "\n".join(random.sample(ADULTHOOD, 3))
@@ -2094,7 +2096,11 @@ async def ask_user_field(message, user_id):
         state = user_states[user_id]
         server = state["server"]
         data = state["data"]
+        template = BIO_TEMPLATES.get(server)
+        fields = set(re.findall(r"\{(\w+)\}", template)) if template else set()
         bio = generate_bio(server, data)
+        if "photo" in fields:
+            await message.answer("Пожалуйста, прикрепи личное фото к анкете отдельным сообщением.")
         await message.answer(bio, reply_markup=main_menu())
         user_states.pop(user_id, None)
 
