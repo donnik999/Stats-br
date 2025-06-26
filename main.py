@@ -1832,6 +1832,10 @@ def gen_field(field, data):
         return random.choice(RESIDENCES)
     if field == "appearance":
         return random.choice(APPEARANCES)
+    if field == "childhood_and_youth":
+    # city можно брать из data, если пользователь ввёл город, либо рандомно
+    city = data.get("birthplace") or random.choice(BIRTHPLACES)
+    return generate_childhood_and_youth(city)
     if field == "traits":
         return random.choice(TRAITS)
     if field == "hobby":
@@ -1922,6 +1926,11 @@ def generate_birthdate_by_age(age: int) -> str:
     return f"{day:02d}.{month:02d}.{birth_year}"
     
 def generate_childhood_and_youth(city="Батырево"):
+    birth_places = [
+        "Я родился и вырос в {city}, небольшом, но очень уютном городке.",
+        "Моё детство прошло в {city}, где всегда царила особая атмосфера доброты и уюта.",
+        "С ранних лет я жил в {city} — месте, которое навсегда осталось в моём сердце."
+    ]
     parts = [
         random.choice(birth_places).format(city=city),
         random.choice(childhood_memories),
@@ -1930,6 +1939,8 @@ def generate_childhood_and_youth(city="Батырево"):
         random.choice(school_youth),
         random.choice(college_and_search),
     ]
+    selected = random.sample(parts, k=random.randint(3, 5))
+    return " ".join(selected)
     
 def generate_parents(surname):
     male_name = random.choice(MALE_NAMES)
