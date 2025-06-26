@@ -1783,16 +1783,12 @@ USER_FIELDS = ["name", "surname", "age", "gender", "nationality"]
 
 def gen_field(field, data):
     field_low = field.lower()
-    if "возраст" in field_low or "age" in field_low:
-        age = data.get("age") or random.randint(18, 60)
-        return str(age)
-    if "дата рождения" in field_low or "birth" in field_low:
-        age = data.get("age") or random.randint(18, 60)
-        return generate_birthdate_by_age(int(age))
     if field == "dob":
         age = data.get("age") or random.randint(18, 60)
         return generate_birthdate_by_age(int(age))
-    if field == "birthplace":
+    if field == "dob_place":
+        age = data.get("age") or random.randint(18, 60)
+        return f"{generate_birthdate_by_age(int(age))}, {random.choice(BIRTHPLACES)}"
         return random.choice(BIRTHPLACES)
     if field == "residence":
         return random.choice(RESIDENCES)
