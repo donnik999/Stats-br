@@ -14,6 +14,10 @@ from aiogram.client.default import DefaultBotProperties
 
 API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'  # <-- Вставь сюда токен
 
+
+FIO_SERVERS = {"AZURE", "PLATINUM", "CHILLI", "PERM", "MURMANSK", "PENZA"}
+DEFAULT_USER_FIELDS = ["name", "surname", "age", "gender", "nationality"]
+
 # ---------------------- Примеры для генерации -------------------------
 BIRTHPLACES = ["Арзамас", "Батырево", "Южный", "Егоровка", "Корякино", "Рублевка", "Бусаево", "Нижегородск"]
 RESIDENCES = ["Арзамас", "Рублевка", "Бусаево", "Южный", "Егоровка", "Нижегородск", "Батырево"]
@@ -587,8 +591,7 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "AZURE": '''Имя: {name}
-Фамилия: {surname}
+    "AZURE": '''ФИО: {fio}
 Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
@@ -602,8 +605,7 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "PLATINUM": '''Имя: {name}
-Фамилия: {surname}
+    "PLATINUM": '''ФИО: {fio}
 Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
@@ -662,8 +664,7 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''', 
-    "CHILLI": '''Имя: {name}
-Фамилия: {surname}
+    "CHILLI": '''ФИО: {fio}
 Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
@@ -1132,8 +1133,7 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "PERM": '''Имя: {name}
-Фамилия: {surname}
+    "PERM": '''ФИО: {fio}
 Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
@@ -1182,8 +1182,7 @@ BIO_TEMPLATES = {
 Взрослая жизнь: {adulthood}
 Хобби: {hobby}
 ''',
-    "MURMANSK": '''Имя: {name}
-Фамилия: {surname}
+    "MURMANSK": '''ФИО: {fio}
 Возраст: {age}
 Дата рождения: {dob}
 Пол: {gender}
@@ -1198,7 +1197,7 @@ BIO_TEMPLATES = {
 Хобби: {hobby}
 Внешность: {appearance}
 ''',
-    "PENZA": '''Имя: {name}
+    "PENZA": '''ФИО: {fio}
 Фамилия: {surname}
 Возраст: {age}
 Дата и место рождения: {dob_place}
@@ -1840,6 +1839,8 @@ def gen_field(field, data):
         return random.choice(["Служил", "Не служил"])
     if field == "photo":
         return "—"
+    if field == "fio":
+        return data.get("fio") or "Иванов Иван Иванович"
     if field == "job":
         return random.choice(["Инженер", "Врач", "Учитель", "Менеджер"])
     if field == "criminal":
@@ -1934,29 +1935,32 @@ async def write_bio(message: Message):
 @router.callback_query(F.data.startswith("server_"))
 async def handle_server_choice(call: CallbackQuery):
     server = call.data.replace("server_", "")
+    # Выбираем список полей в зависимости от сервера
+    user_fields = ["fio", "age", "gender", "nationality"] if server in FIO_SERVERS else DEFAULT_USER_FIELDS
     user_states[call.from_user.id] = {
         "step": "collect_user_fields",
         "server": server,
         "data": {},
-        "user_field_idx": 0
-    }
-    await ask_user_field(call.message, call.from_user.id)
-    await call.answer()
+        "user_field_idx": 0,
+        "user_fields": user_fields,
 
 async def ask_user_field(message, user_id):
-    idx = user_states[user_id]["user_field_idx"]
-    if idx < len(USER_FIELDS):
-        field = USER_FIELDS[idx]
+    state = user_states[user_id]
+    idx = state["user_field_idx"]
+    user_fields = state["user_fields"]
+    if idx < len(user_fields):
+        field = user_fields[idx]
         rus = {
             "name": "Имя",
             "surname": "Фамилия",
+            "fio": "ФИО",
             "age": "Возраст",
             "gender": "Пол",
             "nationality": "Национальность"
         }[field]
         await message.answer(f"Введите <b>{rus}</b>:")
-        user_states[user_id]["current_user_field"] = field
-    else:
+        state["current_user_field"] = field
+        else:
         state = user_states[user_id]
         server = state["server"]
         data = state["data"]
