@@ -1782,6 +1782,7 @@ BIO_TEMPLATES = {
 USER_FIELDS = ["name", "surname", "age", "gender", "nationality"]
 
 def gen_field(field, data):
+    field_low = field.lower()
     if "возраст" in field_low or "age" in field_low:
         # Случайно генерируем возраст в разумном диапазоне, если его нет в data
         age = data.get("age") or random.randint(18, 60)
