@@ -1834,8 +1834,8 @@ def gen_field(field, data):
         return random.choice(APPEARANCES)
     if field == "childhood_and_youth":
     # city можно брать из data, если пользователь ввёл город, либо рандомно
-    city = data.get("birthplace") or random.choice(BIRTHPLACES)
-    return generate_childhood_and_youth(city)
+        city = data.get("birthplace") or random.choice(BIRTHPLACES)
+        return generate_childhood_and_youth(city)
     if field == "traits":
         return random.choice(TRAITS)
     if field == "hobby":
