@@ -1872,9 +1872,9 @@ def gen_field(field, data):
     if field == "childhood":
         return "\n".join(random.sample(CHILDHOOD, 3))
     if field == "adulthood":
-        return "\n".join(random.sample(ADULTHOOD, 3))
+        return generate_adulthood()
     if field == "now":
-        return "\n".join(random.sample(NOW, 3))
+        return generate_now()
     if field == "dob":
         return random.choice(DOB_SAMPLE)
     if field == "dob_place":
@@ -1953,6 +1953,14 @@ def generate_birthdate_by_age(age: int) -> str:
     else:
         day = random.randint(1, 31)
     return f"{day:02d}.{month:02d}.{birth_year}"
+
+def generate_adulthood():
+    selected = random.sample(ADULTHOOD, k=5)
+    return " ".join(selected)
+
+def generate_now():
+    selected = random.sample(NOW, k=5) 
+    return " ".join(selected)
     
 def generate_childhood_and_youth(city="Батырево"):
     childhood_texts = [frag.format(city=city) for frag in random.sample(childhood_fragments, k=3)]
