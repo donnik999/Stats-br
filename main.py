@@ -1803,11 +1803,11 @@ def gen_field(field, data):
     if field == "hobby":
         return random.choice(HOBBIES)
     if field == "childhood":
-    return "\n".join(random.sample(CHILDHOOD, 3))
+        return "\n".join(random.sample(CHILDHOOD, 3))
     if field == "adulthood":
-    return "\n".join(random.sample(ADULTHOOD, 3))
+        return "\n".join(random.sample(ADULTHOOD, 3))
     if field == "now":
-    return "\n".join(random.sample(NOW, 3))
+        return "\n".join(random.sample(NOW, 3))
     if field == "dob":
         return random.choice(DOB_SAMPLE)
     if field == "dob_place":
