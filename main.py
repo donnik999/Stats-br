@@ -1784,13 +1784,14 @@ USER_FIELDS = ["name", "surname", "age", "gender", "nationality"]
 def gen_field(field, data):
     field_low = field.lower()
     if "возраст" in field_low or "age" in field_low:
-        # Случайно генерируем возраст в разумном диапазоне, если его нет в data
         age = data.get("age") or random.randint(18, 60)
         return str(age)
     if "дата рождения" in field_low or "birth" in field_low:
-        # Если где-то указан возраст — используем его, иначе случайный
         age = data.get("age") or random.randint(18, 60)
-        return generate_birthdate_by_age(age)
+        return generate_birthdate_by_age(int(age))
+    if field == "dob":
+        age = data.get("age") or random.randint(18, 60)
+        return generate_birthdate_by_age(int(age))
     if field == "birthplace":
         return random.choice(BIRTHPLACES)
     if field == "residence":
@@ -1802,11 +1803,11 @@ def gen_field(field, data):
     if field == "hobby":
         return random.choice(HOBBIES)
     if field == "childhood":
-        return random.choice(CHILDHOOD)
+    return "\n".join(random.sample(CHILDHOOD, 3))
     if field == "adulthood":
-        return random.choice(ADULTHOOD)
+    return "\n".join(random.sample(ADULTHOOD, 3))
     if field == "now":
-        return random.choice(NOW)
+    return "\n".join(random.sample(NOW, 3))
     if field == "dob":
         return random.choice(DOB_SAMPLE)
     if field == "dob_place":
@@ -1815,6 +1816,10 @@ def gen_field(field, data):
         return "Женат, двое детей."
     if field == "education":
         return "Высшее техническое."
+    if field == "youth":
+        return "\n".join(random.sample(YOUTH, 3))
+    if field == "maturity":
+        return "\n".join(random.sample(MATURITY, 3))
     if field == "youth_adult":
         return f"{random.choice(CHILDHOOD)} {random.choice(ADULTHOOD)}"
     if field == "children":
