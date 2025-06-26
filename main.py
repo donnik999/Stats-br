@@ -1913,8 +1913,8 @@ def gen_field(field, data):
     if field == "maturity":
         return "\n".join(random.sample(MATURITY, 3))
     if field == "youth_adult":
-        youth = random.choice(YOUTH_TEMPLATES)
-        adulthood = random.choice(ADULTHOOD_TEMPLATES)
+        youth = " ".join(random.sample(YOUTH, 6))
+        adulthood = " ".join(random.sample(ADULTHOOD, 6))
         return f"{youth}\n\n{adulthood}"
     if field == "children":
         return "Не имеет"
