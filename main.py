@@ -18,11 +18,11 @@ API_TOKEN = '8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw'  # <-- Вставь
 FIO_SERVERS = {"AZURE", "PLATINUM", "CHILLI", "PERM", "MURMANSK", "PENZA"}
 DEFAULT_USER_FIELDS = ["name", "surname", "age", "gender", "nationality"]
 
-MALE_NAMES = ["Александр", "Сергей", "Владимир", "Игорь", "Дмитрий", "Андрей"]
-FEMALE_NAMES = ["Мария", "Екатерина", "Ольга", "Анна", "Татьяна", "Наталья"]
+MALE_NAMES = ["Александр", "Сергей", "Владимир", "Игорь", "Дмитрий", "Андрей", " Вадим", "Петр", "Василий", "Станислав"]
+FEMALE_NAMES = ["Мария", "Екатерина", "Ольга", "Анна", "Татьяна", "Наталья", "Анастасия", "Светлана", "Вероника", "Василиса", "Галина", "Дарья"]
 
 CITIES = [
-    "Батырево", "Арзамас", "Южный", "Нижегородск", "Гарель", "Егоровка"
+    "Батырево", "Арзамас", "Южный", "Нижегородск", "Гарель", "Егоровка", "Бусаево", "Рублевка", "Горки"
 ]
 
 qualities_fragments = [
@@ -1915,7 +1915,7 @@ def gen_field(field, data):
     if field == "youth_adult":
         return f"{random.choice(CHILDHOOD)} {random.choice(ADULTHOOD)}"
     if field == "children":
-        return str(random.randint(0, 3))
+        return "Не имеет"
     if field == "bad_habits":
         return random.choice(["Не курит", "Курит редко", "Не имеет"])
     if field == "parents":
@@ -2099,9 +2099,12 @@ async def ask_user_field(message, user_id):
         template = BIO_TEMPLATES.get(server)
         fields = set(re.findall(r"\{(\w+)\}", template)) if template else set()
         bio = generate_bio(server, data)
-        if "photo" in fields:
-            await message.answer("Пожалуйста, прикрепи личное фото к анкете отдельным сообщением.")
         await message.answer(bio, reply_markup=main_menu())
+        if "photo" in fields:
+            await message.answer(
+                "📷 <b>Пожалуйста, прикрепи личное фото к анкете отдельным сообщением!</b>",
+                parse_mode="HTML"
+            )
         user_states.pop(user_id, None)
 
 @router.message(lambda m: user_states.get(m.from_user.id, {}).get("step") == "collect_user_fields")
