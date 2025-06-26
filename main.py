@@ -1944,7 +1944,13 @@ def gen_field(field, data):
     if field == "photo":
         return "—"
     if field == "fio":
-        return data.get("fio") or "Иванов Иван Иванович"
+        surname = data.get("surname", "")
+        name = data.get("name", "")
+        patronymic = data.get("patronymic", "")  # если у тебя есть отдельное поле отчество
+        fio = f"{surname} {name}".strip()
+    if patronymic:
+        fio += f" {patronymic}"
+    return fio if fio.strip() else "Иванов Иван"
     if field == "job":
         return random.choice(["Инженер", "Врач", "Учитель", "Менеджер"])
     if field == "criminal":
