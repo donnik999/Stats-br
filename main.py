@@ -1960,7 +1960,7 @@ async def ask_user_field(message, user_id):
         }[field]
         await message.answer(f"Введите <b>{rus}</b>:")
         state["current_user_field"] = field
-        else:
+    else:
         state = user_states[user_id]
         server = state["server"]
         data = state["data"]
