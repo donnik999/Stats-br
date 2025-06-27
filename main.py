@@ -1888,7 +1888,7 @@ def gen_field(field, data):
     if field == "hobby":
         return random.choice(HOBBIES)
     if field == "childhood":
-        return "\n".join(random.sample(CHILDHOOD, 3))
+        return "\n".join(random.sample(CHILDHOOD, 10))
     if field == "adulthood":
         return generate_adulthood()
     if field == "now":
@@ -1898,13 +1898,13 @@ def gen_field(field, data):
     if field == "dob_place":
         return f"{random.choice(DOB_SAMPLE)}, {random.choice(BIRTHPLACES)}"
     if field == "family":
-        return "Женат, двое детей."
+        return "Не имеет"
     if field == "education":
         return "Высшее техническое."
     if field == "youth":
-        return "\n".join(random.sample(YOUTH, 3))
+        return "\n".join(random.sample(YOUTH, 10))
     if field == "maturity":
-        return "\n".join(random.sample(MATURITY, 3))
+        return "\n".join(random.sample(MATURITY, 8))
     if field == "youth_adult":
         youth = " ".join(random.sample(YOUTH, 6))
         adulthood = " ".join(random.sample(ADULTHOOD, 6))
@@ -1912,7 +1912,7 @@ def gen_field(field, data):
     if field == "children":
         return "Не имеет"
     if field == "bad_habits":
-        return random.choice(["Не курит", "Курит редко", "Не имеет"])
+        return random.choice(["Курит", "Алкогольная зависимость", "Курит редко", "Не имеет"])
     if field == "parents":
         surname = data.get("surname")
         if not surname and data.get("fio"):
@@ -1921,7 +1921,7 @@ def gen_field(field, data):
             surname = "Иванов"
         return generate_parents(surname)
     if field == "maturity":
-        return random.choice(["Работает", "На пенсии", "Ведет бизнес"])
+        return random.choice(["Работает", "На пенсии", "Занимается рыбалкой", "Ведет бизнес"])
     if field == "build":
         return random.choice(BUILDS)
     if field == "marital":
@@ -1953,11 +1953,11 @@ def gen_field(field, data):
     if field == "job":
         return random.choice(["Инженер", "Врач", "Учитель", "Менеджер"])
     if field == "criminal":
-        return random.choice(["Нет", "Да, условно", "Есть, снята/погашена"])
+        return random.choice(["Нет", "Есть"])
     if field == "qualities":
         return generate_qualities()
     if field == "growing_up":
-        return "\n".join(random.sample(ADULTHOOD, 3))
+        return "\n".join(random.sample(ADULTHOOD, 8))
     if field == "birthplace_residence":
         return f"{random.choice(BIRTHPLACES)} / {random.choice(RESIDENCES)}"
     return "—"
