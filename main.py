@@ -48,6 +48,34 @@ qualities_fragments = [
     "Мудрый, умеет давать дельные советы.",
 ]
 
+ARMY_ATTITUDES = [
+    "Уважает воинскую службу и считает её важной частью гражданского долга.",
+    "Считает службу в армии отличной школой жизни и возможностью закалить характер.",
+    "Относится к воинской службе с пониманием и поддержкой, гордится знакомыми военными.",
+    "Считает, что каждый мужчина должен отдать долг Родине.",
+    "С уважением относится к военнослужащим и поддерживает патриотические ценности.",
+    "Интересуется военной историей и традициями.",
+    "Считает, что армия воспитывает силу воли и ответственность.",
+    "Поддерживает идею обязательной службы для всех, кто годен по здоровью.",
+    "Активно участвует в патриотических мероприятиях и акциях поддержки армии.",
+    "Считает, что армия помогает молодёжи найти своё призвание."
+]
+
+BUILDS = [
+    "Среднего телосложения",
+    "Крепкое, спортивное телосложение",
+    "Худощавый",
+    "Плотное телосложение",
+    "Стройная фигура",
+    "Мускулистый",
+    "Хрупкое телосложение",
+    "Коренастый",
+    "Высокий и худой",
+    "Миниатюрная",
+    "Широкие плечи, узкая талия",
+    "Полноватый"
+]
+
 childhood_memories = [
     "Детство было наполнено яркими моментами и беззаботными днями.",
     "Я часто проводил время во дворе с друзьями, играя в футбол и устраивая веселые приключения.",
@@ -499,11 +527,11 @@ BIO_TEMPLATES = {
 Наши дни: {now}
 ''',
     "BLUE": '''Имя, фамилия: {fio}
-Возраст: {age}
 Пол: {gender}
+Дата рождения: {dob}
+Возраст {age}
 Национальность: {nationality}
 Семья: {family}
-Место рождения: {birthplace}
 Описание внешности: {appearance}
 Описание характера: {traits}
 Место проживания: {residence}
@@ -513,9 +541,9 @@ BIO_TEMPLATES = {
 Хобби: {hobby}
 ''',
     "YELLOW": '''Имя, фамилия: {fio}
-Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -527,9 +555,8 @@ BIO_TEMPLATES = {
 Хобби: {hobby}
 ''',
     "ORANGE": '''Имя, фамилия: {fio}
-Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Место проживания: {residence}
 Внешность: {appearance}
@@ -540,35 +567,40 @@ BIO_TEMPLATES = {
 ''',
     "PURPLE": '''Имя: {name}
 Фамилия: {surname}
-Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
-Место рождения: {birthplace}
-Место проживания: {residence}
-Описание внешности: {appearance}
-Особенности характера: {traits}
-Хобби: {hobby}
+Возраст: {age}
+Дата и место рождения: {dob_place}
+Семейное положение: {family}
+Образование: {education}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
+Телосложение: {build}
+Увлечение: {hobby}
 Детство: {childhood}
 Взрослая жизнь: {adulthood}
 Настоящее время: {now}
 ''',
     "LIME": '''Имя, фамилия: {fio}
-Возраст: {age}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
 Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
     "PINK": '''Имя, фамилия: {fio}
-Возраст: {age}
 Пол: {gender}
+Дата рождения: {dob}
+Возраст: {age}
 Национальность: {nationality}
 Семья: {family}
 Описание внешности: {appearance}
@@ -579,11 +611,10 @@ BIO_TEMPLATES = {
 Взрослая жизнь: {adulthood}
 Хобби: {hobby}
 ''',
-    "CHERRY": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "CHERRY": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -594,11 +625,10 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "BLACK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "BLACK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -609,11 +639,10 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "INDIGO": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "INDIGO": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -624,11 +653,10 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "WHITE": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "WHITE": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -639,11 +667,10 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "MAGENTA": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "MAGENTA": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -654,12 +681,11 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "CRIMSON": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "CRIMSON": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
 Дата и место рождения: {dob_place}
+Возраст: {age}
 Семья: {family}
 Место проживания: {residence}
 Внешность: {appearance}
@@ -669,11 +695,10 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "GOLD": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "GOLD": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -686,20 +711,44 @@ BIO_TEMPLATES = {
 ''',
     "AZURE": '''ФИО: {fio}
 Дата и место рождения: {dob_place}
-Семья: {family}
+Родители: {parents}
 Образование: {education}
-Место проживания: {residence}
-Внешность: {appearance}
+Рост: {height}
+Вес: {weight}
 Особенности характера: {traits}
-Детство: {childhood}
-Юность и взрослая жизнь: {youth_adult}
-Настоящее время: {now}
+Период воинской жизни: {army}
+Трудовая деятельность: {job}
+Семейное положение: {family}
 Хобби: {hobby}
+Детство: {childhood}
+Юность: {youth}
+Взрослая жизнь: {adulthood}
 ''',
     "PLATINUM": '''ФИО: {fio}
+Пол: {gender}
+Дата рождения: {dob}
 Возраст: {age}
+Национальность: {nationality}
+Место рождения: {birthplace}
+Образование: {education}
+Отношение к воинской службе: {attitude_to_army}
+Семья: {family}
+Место проживания на момент жизни с родителями: {residence}
+Внешность: {appearance}
+Особенности характера: {traits}
+Фото: {photo}
+Детство: {childhood}
+Юность: {youth}
+Настоящее время: {now}
+Семейное положение: {marital}
+Место проживания на данный момент: {marital}
+Судимость: {criminal}
+Хобби: {hobby}
+''',
+    "AQUA": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -710,11 +759,10 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "AQUA": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "GRAY": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -725,26 +773,10 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "GRAY": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "ICE": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
-Детство: {childhood}
-Юность и взрослая жизнь: {youth_adult}
-Настоящее время: {now}
-Хобби: {hobby}
-''',
-    "ICE": '''Имя: {name}
-Фамилия: {surname}
 Возраст: {age}
-Пол: {gender}
-Национальность: {nationality}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
@@ -756,146 +788,157 @@ BIO_TEMPLATES = {
 Хобби: {hobby}
 ''', 
     "CHILLI": '''ФИО: {fio}
-Возраст: {age}
 Пол: {gender}
+Дата рождения: {dob}
+Возраст: {age}
 Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Место проживания: {residence}
+Место рождения: {birthplace}
+Образование: {education}
+Отношение к воинской службе: {attitude_to_army}
+Семья: {family}
+Место проживания на момент жизни с родителями: {residence}
 Внешность: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
 Юность: {youth}
-Взрослая жизнь: {adulthood}
 Настоящее время: {now}
+Семейное положение: {marital}
+Место текущего проживания: {residence}
+Судимость: {criminal}
 Хобби: {hobby}
 ''',
     "CHOCO": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
 Место рождения: {birthplace}
 Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
 Семейное положение: {family}
 Дети: {children}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
+Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
+Фото: {photo}
 Детство: {childhood}
 Юность: {youth}
-Взрослая жизнь: {adulthood}
+Взросление: {growing_up}
 Зрелость: {maturity}
 Наши дни: {now}
 ''',
-    "MOSCOW": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "MOSCOW": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
 Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "SPB": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "SPB": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
 Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
     "UFA": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
 Место рождения: {birthplace}
 Место проживания: {residence}
 Семейное положение: {family}
 Дети: {children}
-Внешность: {appearance}
-Особенности характера: {traits}
+Пол: {gender}
+Рост: {heigh}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
 Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
+Личное фото: {photo}
 Детство: {childhood}
 Юность: {youth}
 Взросление: {adulthood}
 Зрелость: {maturity}
 Наши дни: {now}
 ''',
-    "SOCHI": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "SOCHI": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
 Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "KAZAN": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KAZAN": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
 Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "SAMARA": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "SAMARA": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
 Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
     "ROSTOV": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
 Место рождения: {birthplace}
 Место проживания: {residence}
 Семейное положение: {family}
 Дети: {children}
-Внешность: {appearance}
-Особенности характера: {traits}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
 Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
 Детство: {childhood}
 Юность: {youth}
 Взросление: {adulthood}
@@ -1929,12 +1972,16 @@ def gen_field(field, data):
         return generate_parents(surname)
     if field == "maturity":
         return random.choice(["Работает", "На пенсии", "Ведет бизнес"])
+    if field == "build":
+        return random.choice(BUILDS)
     if field == "marital":
         return random.choice(["Женат", "Холост", "В разводе"])
     if field == "height":
         return f"{random.randint(160, 200)} см"
     if field == "weight":
         return f"{random.randint(50, 120)} кг"
+    if field == "attitude_to_army":
+        return random.choice(ARMY_ATTITUDES)
     if field == "eyes":
         return random.choice(["Голубые", "Карие", "Зеленые", "Серые"])
     if field == "hair":
