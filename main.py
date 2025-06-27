@@ -1803,7 +1803,7 @@ BIO_TEMPLATES = {
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "BRATSK": '''Имя, фамилия: {fio}
+    "SURGUT": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
 Возраст: {age}
