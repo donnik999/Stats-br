@@ -481,7 +481,7 @@ ALL_SERVERS = [
     "CHEBOKSARY", "KHABAROVSK", "PERM", "TULA", "RYAZAN", "MURMANSK", "PENZA", "KURSK", "ARCHANGELSK",
     "ORENBURG", "KIROV", "KEMEROVO", "TYUMEN", "TOLYATI", "IVANOVO", "STAVROPOL", "SMOLENSK", "PSKOV",
     "BRYANSK", "OREL", "YAROSLAVL", "BARNAUL", "LIPETSK", "ULYANOVSK", "YAKUTSK", "TAMBOV", "BRATSK",
-    "ASTRACHAN", "CHITA", "KOSTROMA", "VLADIMIR", "KALUGA", "NOVGOROD", "TAGANROG", "VOLOGDA", "TVER",
+    "ASTRAKHAN", "CHITA", "KOSTROMA", "VLADIMIR", "KALUGA", "NOVGOROD", "TAGANROG", "VOLOGDA", "TVER",
     "TOMSK", "IZHEVSK", "SURGUT", "PODOLSK", "MAGADAN", "CHEREPOVETS"
 ]
 
@@ -1269,11 +1269,10 @@ BIO_TEMPLATES = {
 Имеется ли судимость: {criminal}
 Ваше хобби: {hobby}
 ''',
-    "TULA": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "TULA": '''Имя, фамилия: {fio}
 Пол: {gender}
 Дата рождения: {dob}
+Возраст: {age}
 Национальность: {nationality}
 Место рождения и проживания: {birthplace_residence}
 Семья: {family}
@@ -1284,18 +1283,17 @@ BIO_TEMPLATES = {
 Взрослая жизнь: {adulthood}
 Настоящее время: {now}
 ''',
-    "RYAZAN": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "RYAZAN": '''Имя, фамилия: {fio}
 Пол: {gender}
 Дата рождения: {dob}
+Возраст: {age}
 Национальность: {nationality}
 Семья: {family}
 Описание внешности: {appearance}
 Описание характера: {traits}
 Место проживания: {residence}
 Образование: {education}
-Детство и юность: {childhood}
+Детство и юность: {childhood_and_youth}
 Взрослая жизнь: {adulthood}
 Хобби: {hobby}
 ''',
@@ -1315,8 +1313,6 @@ BIO_TEMPLATES = {
 Внешность: {appearance}
 ''',
     "PENZA": '''ФИО: {fio}
-Фамилия: {surname}
-Возраст: {age}
 Дата и место рождения: {dob_place}
 Сведения о родителях: {parents}
 Образование: {education}
@@ -1331,77 +1327,74 @@ BIO_TEMPLATES = {
 Юность: {youth}
 Взрослая жизнь: {adulthood}
 ''',
-    "KURSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KURSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "ARCHANGELSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "ARKHANGELSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
     "ORENBURG": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
 Место рождения: {birthplace}
 Место проживания: {residence}
 Семейное положение: {family}
 Дети: {children}
-Внешность: {appearance}
-Особенности характера: {traits}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
 Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
 Детство: {childhood}
 Юность: {youth}
 Взросление: {adulthood}
 Зрелость: {maturity}
 Наши дни: {now}
 ''',
-    "KIROV": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KIROV": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "KEMEROVO": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KEMEROVO": '''Имя, фамилия: {fio}
 Пол: {gender}
 Дата рождения: {dob}
+Возраст: {age}
 Национальность: {nationality}
 Семья: {family}
 Описание внешности: {appearance}
@@ -1412,487 +1405,461 @@ BIO_TEMPLATES = {
 Взрослая жизнь: {adulthood}
 Хобби: {hobby}
 ''',
-    "TYUMEN": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "TYUMEN": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
 Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "TOLYATI": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "TOLYATI": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
 Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "IVANOVO": '''Имя: {name}
-Фамилия: {surname}
+    "IVANOVO": '''Имя, фамилия: {fio}
+Пол: {gender}
+Дата рождения: {dob}
 Возраст: {age}
+Национальность: {nationality}
+Семья: {family}
+Описание внешности: {appearance}
+Описание характера: {traits}
+Место проживания: {residence}
+Образование: {education}
+Детство и юность: {childhood}
+Взрослая жизнь: {adulthood}
+Хобби: {hobby}
+''',
+    "STAVROPOL": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "STAVROPOL": '''Имя: {name}
-Фамилия: {surname}
+    "SMOLENSK": '''Имя, фамилия: {fio}
+Пол: {gender}
+Дата рождения: {dob}
 Возраст: {age}
+Национальность: {nationality}
+Семья: {family}
+Описание внешности: {appearance}
+Описание характера: {traits}
+Место проживания: {residence}
+Образование: {education}
+Детство и юность: {childhood}
+Взрослая жизнь: {adulthood}
+Хобби: {hobby}
+''',
+    "PSKOV": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "SMOLENSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "BRYANSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "PSKOV": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "OREL": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
-''',
-    "BRYANSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
-Пол: {gender}
-Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
-Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
-''',
-    "OREL": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
-Пол: {gender}
-Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
-Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
     "YAROSLAVL": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
+Место рождения: {birthplace}
 Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
+Семейное положение: {family}
+Дети: {children}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
+Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
+Фото: {photo}
 Детство: {childhood}
 Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
+Взросление: {adulthood}
+Зрелость: {maturity}
+Наши дни: {now}
 ''',
-    "BARNAUL": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "BARNAUL": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
     "LIPETSK": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
+Национальность: {nationality}
+Место рождения: {birthplace}
+Место проживания: {residence}
+Семейное положение: {family}
+Дети: {children}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
+Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
+Фото: {photo}
+Детство: {childhood}
+Юность: {youth}
+Взросление: {adulthood}
+Зрелость: {maturity}
+Наши дни: {now}
+''',
+    "ULYANOVSK": '''Имя, фамилия: {fio}
+Пол: {gender}
+Дата рождения: {dob}
+Возраст: {age}
+Национальность: {nationality}
+Семья: {family}
+Описание внешности: {appearance}
+Описание характера: {traits}
+Место проживания: {residence}
+Образование: {education}
+Детство и юность: {childhood}
+Взрослая жизнь: {adulthood}
+Хобби: {hobby}
+''',
+    "YAKUTSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
-Место проживания: {residence}
 Внешность: {appearance}
-Особенности характера: {traits}
+Качества личности и Особенности характера: {traits}
 Детство: {childhood}
 Юность: {youth}
 Взрослая жизнь: {adulthood}
+Место проживания: {residence}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "ULYANOVSK": '''Имя: {name}
-Фамилия: {surname}
+    "TAMBOV": '''Имя, фамилия: {fio}
+Пол: {gender}
+Дата рождения: {dob}
 Возраст: {age}
+Национальность: {nationality}
+Семья: {family}
+Описание внешности: {appearance}
+Описание характера: {traits}
+Место проживания: {residence}
+Образование: {education}
+Детство и юность: {childhood}
+Взрослая жизнь: {adulthood}
+Хобби: {hobby}
+''',
+    "BRATSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "YAKUTSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "ASTRAKHAN": '''Имя, фамилия: {fio}
 Пол: {gender}
-Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
-Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
-''',
-    "TAMBOV": '''Имя: {name}
-Фамилия: {surname}
+Дата рождения: {dob}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
-Дата и место рождения: {dob_place}
 Семья: {family}
+Описание внешности: {appearance}
+Описание характера: {traits}
 Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
-Детство: {childhood}
-Юность: {youth}
+Образование: {education}
+Детство и юность: {childhood}
 Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
-''',
-    "BRATSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
-Пол: {gender}
-Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
-Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
-''',
-    "ASTRACHAN": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
-Пол: {gender}
-Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
-Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
 Хобби: {hobby}
 ''',
     "CHITA": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
+Место рождения: {birthplace}
 Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
+Семейное положение: {family}
+Дети: {children}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
+Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
 Детство: {childhood}
 Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
+Взросление: {adulthood}
+Зрелость: {maturity}
+Наши дни: {now}
 ''',
-    "KOSTROMA": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KOSTROMA": '''ФИО: {fio}
 Пол: {gender}
+Дата рождения: {dob}
+Возраст: {age}
 Национальность: {nationality}
-Дата и место рождения: {dob_place}
+Место рождения: {birthlace}
 Образование: {education}
+Отношение к воинской службе: {attitude_to_army}
 Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
+Место проживания на момент проживания с родителями: {residence}
+Описание внешности: {appearance}
 Особенности характера: {traits}
-Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
+Ваше фото: {photo}
+Детство(От десяти строк): {childhood}
+Юность(От десяти строк): {youth}
+Настоящее время(От десяти строк): {now}
+Семейное положение: {marital}
+Место текущего проживания: {residence}
+Имеется ли судимость?: {criminal}
+Ваше хобби: {hobby}
 ''',
-    "VLADIMIR": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "VLADIMIR": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "KALUGA": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KALUGA": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "NOVGOROD": '''Имя: {name}
-Фамилия: {surname}
+    "NOVGOROD": '''Имя, фамилия: {fio}
+Пол: {gender}
+Дата рождения: {dob}
 Возраст: {age}
+Национальность: {nationality}
+Семья: {family}
+Описание внешности: {appearance}
+Описание характера: {traits}
+Место проживания: {residence}
+Образование: {education}
+Детство и юность: {childhood}
+Взрослая жизнь: {adulthood}
+Хобби: {hobby}
+''',
+    "TAGANROG": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "TAGANROG": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "VOLOGDA": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "VOLOGDA": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "TVER": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "TVER": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "TOMSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "TOMSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "IZHEVSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "IZHEVSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "BRATSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
 Юность: {youth}
 Взрослая жизнь: {adulthood}
+Место проживания: {residence}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "SURGUT": '''Имя: {name}
-Фамилия: {surname}
+    "PODOLSK": '''Имя, фамилия: {fio}
+Пол: {gender}
+Дата рождения: {dob}
 Возраст: {age}
+Национальность: {nationality}
+Семья: {family}
+Описание внешности: {appearance}
+Описание характера: {traits}
+Место проживания: {residence}
+Образование: {education}
+Детство и юность: {childhood}
+Взрослая жизнь: {adulthood}
+Хобби: {hobby}
+''',
+    "MAGADAN": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "PODOLSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "CHEREPOVETS": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "MAGADAN": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
-Пол: {gender}
-Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
-Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
-''',
-    "CHEREPOVETS": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
-Пол: {gender}
-Национальность: {nationality}
-Дата и место рождения: {dob_place}
-Семья: {family}
-Место проживания: {residence}
-Внешность: {appearance}
-Особенности характера: {traits}
-Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
-Настоящее время: {now}
-Хобби: {hobby}
-'''
 }
 
 # --------------------- Пользовательские поля --------------------------
