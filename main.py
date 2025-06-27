@@ -947,44 +947,45 @@ BIO_TEMPLATES = {
 ''',
     "ANAPA": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
 Место рождения: {birthplace}
 Место проживания: {residence}
 Семейное положение: {family}
 Дети: {children}
-Внешность: {appearance}
-Особенности характера: {traits}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
 Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
 Детство: {childhood}
 Юность: {youth}
 Взросление: {adulthood}
 Зрелость: {maturity}
 Наши дни: {now}
 ''',
-    "EKB": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "EKB": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
 Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "KRASNODAR": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KRASNODAR": '''Имя, фамилия: {fio}
 Пол: {gender}
-Национальность: {nationality}
 Дата рождения: {dob}
+Возраст: {age}
+Национальность: {nationality}
 Семья: {family}
 Описание внешности: {appearance}
 Описание характера: {traits}
@@ -994,142 +995,131 @@ BIO_TEMPLATES = {
 Взрослая жизнь: {adulthood}
 Хобби: {hobby}
 ''',
-    "ARZAMAS": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "ARZAMAS": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "NOVOSIB": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "NOVOSIB": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "GROZNY": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "GROZNY": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "SARATOV": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "SARATOV": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "OMSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "OMSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
     "IRKUTSK": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
 Место рождения: {birthplace}
 Место проживания: {residence}
 Семейное положение: {family}
 Дети: {children}
-Внешность: {appearance}
-Особенности характера: {traits}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
 Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
 Детство: {childhood}
 Юность: {youth}
 Взросление: {adulthood}
 Зрелость: {maturity}
 Наши дни: {now}
 ''',
-    "VOLGOGRAD": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "VOLGOGRAD": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''', 
-    "VORONEZH": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "VORONEZH": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "BELGOROD": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "BELGOROD": '''Имя, фамилия: {fio}
 Пол: {gender}
-Национальность: {nationality}
 Дата рождения: {dob}
+Возраст: {age}
+Национальность: {nationality}
 Семья: {family}
 Описание внешности: {appearance}
 Описание характера: {traits}
@@ -1139,12 +1129,11 @@ BIO_TEMPLATES = {
 Взрослая жизнь: {adulthood}
 Хобби: {hobby}
 ''',
-    "MAKHACHKALA": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "MAKHACHKALA": '''Имя, фамилия: {fio}
 Пол: {gender}
-Национальность: {nationality}
 Дата рождения: {dob}
+Возраст: {age}
+Национальность: {nationality}
 Семья: {family}
 Описание внешности: {appearance}
 Описание характера: {traits}
@@ -1154,44 +1143,40 @@ BIO_TEMPLATES = {
 Взрослая жизнь: {adulthood}
 Хобби: {hobby}
 ''',
-    "VLADIKAVKAZ": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "VLADIKAVKAZ": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "VLADIVOSTOK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "VLADIVOSTOK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Качества личности и особенности характера: {traits}
-Место проживания: {residence}
 Детство: {childhood}
 Юность: {youth}
 Взрослая жизнь: {adulthood}
+Место текущего проживания: {residence}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "KALININGRAD": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KALININGRAD": '''Имя, фамилия: {fio}
 Пол: {gender}
-Национальность: {nationality}
 Дата рождения: {dob}
+Возраст: {age}
+Национальность: {nationality}
 Семья: {family}
 Описание внешности: {appearance}
 Описание характера: {traits}
@@ -1203,67 +1188,65 @@ BIO_TEMPLATES = {
 ''',
     "CHELYABINSK": '''Имя: {name}
 Фамилия: {surname}
+Родители: {parents}
 Возраст: {age}
-Пол: {gender}
 Национальность: {nationality}
 Место рождения: {birthplace}
 Место проживания: {residence}
 Семейное положение: {family}
 Дети: {children}
-Внешность: {appearance}
-Особенности характера: {traits}
+Пол: {gender}
+Рост: {height}
+Вес: {weight}
+Цвет глаз: {eyes}
+Волосы: {hair}
 Плохие привычки: {bad_habits}
+Черты характера и личные качества: {qualities}
 Детство: {childhood}
 Юность: {youth}
 Взросление: {adulthood}
 Зрелость: {maturity}
 Наши дни: {now}
 ''',
-    "KRASNOYARSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KRASNOYARSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "CHEBOKSARY": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "CHEBOKSARY": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
-    "KHABAROVSK": '''Имя: {name}
-Фамилия: {surname}
-Возраст: {age}
+    "KHABAROVSK": '''Имя, фамилия: {fio}
 Пол: {gender}
 Национальность: {nationality}
+Возраст: {age}
 Дата и место рождения: {dob_place}
 Семья: {family}
 Место проживания: {residence}
-Внешность: {appearance}
+Описание внешности: {appearance}
 Особенности характера: {traits}
 Детство: {childhood}
-Юность: {youth}
-Взрослая жизнь: {adulthood}
+Юность и взрослая жизнь: {youth_adult}
 Настоящее время: {now}
 Хобби: {hobby}
 ''',
@@ -1273,7 +1256,7 @@ BIO_TEMPLATES = {
 Национальность: {nationality}
 Место рождения: {birthplace}
 Образование: {education}
-Отношение к воинской службе: {army}
+Отношение к воинской службе: {attitude_to_army}
 Семья: {family}
 Место проживания: {residence}
 Внешность: {appearance}
