@@ -1,11 +1,11 @@
-import os
+import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.enums import ParseMode
 import openai
-import asyncio
 
-# Настройка токенов
+TELEGRAM_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"  # Например: "1234567890:AA..."
+OPENAI_API_KEY = "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"     # Например: "sk-..."
 
 openai.api_key = OPENAI_API_KEY
 
@@ -14,7 +14,7 @@ dp = Dispatcher()
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
-    await message.answer("Привет! Напиши мне любой вопрос, и я постараюсь ответить с помощью OpenAI :)")
+    await message.answer("Привет! Напиши мне что-нибудь, и я отвечу через OpenAI.")
 
 @dp.message(F.text)
 async def chat_with_gpt(message: types.Message):
