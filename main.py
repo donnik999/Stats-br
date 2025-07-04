@@ -4,7 +4,7 @@ from aiogram.filters import Command
 import openai
 
 TELEGRAM_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"   # <<-- ВСТАВЬ СВОЙ ТОКЕН
-OPENAI_API_KEY = "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"      # <<-- ВСТАВЬ СВОЙ OpenAI ключ
+OPENAI_API_KEY = "hf_PCYhkBcvAAXOlVdeDDoQnztkhYaoxwgYfGywfMeMsOgA"      # <<-- ВСТАВЬ СВОЙ OpenAI ключ
 
 openai.api_key = OPENAI_API_KEY
 
