@@ -1,35 +1,62 @@
 import asyncio
+import logging
+import requests
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command
-import openai
+from aiogram.types import Message
+from aiogram.filters import CommandStart
+from aiogram.enums import ParseMode
+from aiogram.utils.markdown import hcode
 
-TELEGRAM_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"   # <<-- ВСТАВЬ СВОЙ ТОКЕН
-OPENAI_API_KEY = "hf_PCYhkBcvAAXOlVdeDDoQnztkhYaoxwgYfGywfMeMsOgA"      # <<-- ВСТАВЬ СВОЙ OpenAI ключ
+# 🧠 Вставь свои токены сюда
+TELEGRAM_BOT_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
+HUGGINGFACE_API_TOKEN = "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"
+HUGGINGFACE_MODEL = "gpt2"  # можно сменить на другую модель
 
-openai.api_key = OPENAI_API_KEY
+# --- Hugging Face API ---
+HF_API_URL = f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}"
+HEADERS = {"Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}"}
 
-bot = Bot(token=TELEGRAM_TOKEN)
-dp = Dispatcher()
 
-@dp.message(Command("start"))
-async def cmd_start(message: types.Message):
-    await message.answer("Привет! Напиши мне что-нибудь, я спрошу у OpenAI.")
+# --- Обработка команды /start ---
+async def cmd_start(message: Message):
+    await message.answer("Привет! Напиши мне что-нибудь, и я отвечу с помощью Hugging Face 🤖")
 
-@dp.message(F.text)
-async def chat_with_gpt(message: types.Message):
+
+# --- Обработка текстовых сообщений ---
+async def handle_text(message: Message):
+    user_input = message.text
+    payload = {"inputs": user_input}
+
     try:
-        resp = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Ты дружелюбный ассистент."},
-                {"role": "user", "content": message.text}
-            ],
-            max_tokens=150,
-        )
-        reply = resp['choices'][0]['message']['content']
+        await message.chat.do("typing")
+        response = requests.post(HF_API_URL, headers=HEADERS, json=payload, timeout=30)
+        data = response.json()
+
+        if isinstance(data, dict) and "error" in data:
+            await message.answer(f"Ошибка: {hcode(data['error'])}", parse_mode=ParseMode.HTML)
+        elif isinstance(data, list) and "generated_text" in data[0]:
+            generated = data[0]["generated_text"]
+            reply = generated[len(user_input):].strip()
+            await message.answer(reply or "Модель вернула пустой ответ 🤔")
+        else:
+            await message.answer("Что-то пошло не так. Попробуй снова.")
     except Exception as e:
-        reply = f"Ошибка OpenAI: {e}"
-    await message.answer(reply, parse_mode="HTML")  # parse_mode здесь, а не при создании Bot
+        await message.answer(f"Ошибка при обращении к API: {e}")
+
+
+# --- Основной запуск ---
+async def main():
+    logging.basicConfig(level=logging.INFO)
+
+    bot = Bot(token=TELEGRAM_BOT_TOKEN)
+    dp = Dispatcher()
+
+    dp.message.register(cmd_start, CommandStart())
+    dp.message.register(handle_text, F.text & ~F.command)
+
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
-    asyncio.run(dp.start_polling(bot))
+    asyncio.run(main())
