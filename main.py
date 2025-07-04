@@ -9,7 +9,7 @@ from aiogram.utils.markdown import hcode
 
 # 🧠 Вставь свои токены сюда
 TELEGRAM_BOT_TOKEN = "8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw"
-HUGGINGFACE_API_TOKEN = "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"
+HUGGINGFACE_API_TOKEN = "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"
 HUGGINGFACE_MODEL = "gpt2"  # можно сменить на другую модель
 
 # --- Hugging Face API ---
