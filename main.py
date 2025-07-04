@@ -6,8 +6,6 @@ import openai
 import asyncio
 
 # Настройка токенов
-TELEGRAM_TOKEN = os.getenv("8124119601:AAEgnFwCalzIKU15uHpIyWlCRbu4wvNEAUw")  # положи свой токен Telegram сюда или в переменные окружения
-OPENAI_API_KEY = os.getenv("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")  # положи свой OpenAI ключ сюда или в переменные окружения
 
 openai.api_key = OPENAI_API_KEY
 
